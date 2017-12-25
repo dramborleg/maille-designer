@@ -19,6 +19,13 @@ add_definitions(${NANOGUI_EXTRA_DEFS})
 # On top of adding the path to nanogui/include, you may need extras
 include_directories(${NANOGUI_EXTRA_INCS})
 
+# Include OpenGL directories for FreeBSD
+if(CMAKE_SYSTEM MATCHES "FreeBSD")
+  find_package(OpenGL REQUIRED)
+  include_directories(${OPENGL_INCLUDE_DIR})
+  link_directories( "/usr/local/lib/" )
+endif()
+
 # Compile a target using NanoGUI
 add_executable(maille main.cpp)
 
