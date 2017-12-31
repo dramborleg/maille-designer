@@ -6,6 +6,7 @@
 #include <nanogui/common.h>
 
 #include <iostream>
+#include <math.h>
 #include <string>
 
 using std::endl;
@@ -40,43 +41,40 @@ public:
             "}"
         );
 
-        MatrixXu indices(3, 12); /* Draw a cube */
-        indices.col( 0) << 0, 1, 3;
-        indices.col( 1) << 3, 2, 1;
-        indices.col( 2) << 3, 2, 6;
-        indices.col( 3) << 6, 7, 3;
-        indices.col( 4) << 7, 6, 5;
-        indices.col( 5) << 5, 4, 7;
-        indices.col( 6) << 4, 5, 1;
-        indices.col( 7) << 1, 0, 4;
-        indices.col( 8) << 4, 0, 3;
-        indices.col( 9) << 3, 7, 4;
-        indices.col(10) << 5, 6, 2;
-        indices.col(11) << 2, 1, 5;
+        float radius = 1.2;
+        float width = 0.4;
+        unsigned nTheta = 32;
+        unsigned nAlpha = 8;
 
-        MatrixXf positions(3, 8);
-        positions.col(0) << -1,  1,  1;
-        positions.col(1) << -1,  1, -1;
-        positions.col(2) <<  1,  1, -1;
-        positions.col(3) <<  1,  1,  1;
-        positions.col(4) << -1, -1,  1;
-        positions.col(5) << -1, -1, -1;
-        positions.col(6) <<  1, -1, -1;
-        positions.col(7) <<  1, -1,  1;
+        MatrixXf positions(3, nTheta * nAlpha);
+        MatrixXu indices(3, 2 * nAlpha * nTheta);
+        MatrixXf colors(3, 2 * nAlpha * nTheta);
 
-        MatrixXf colors(3, 12);
-        colors.col( 0) << 1, 0, 0;
-        colors.col( 1) << 0, 1, 0;
-        colors.col( 2) << 1, 1, 0;
-        colors.col( 3) << 0, 0, 1;
-        colors.col( 4) << 1, 0, 1;
-        colors.col( 5) << 0, 1, 1;
-        colors.col( 6) << 1, 1, 1;
-        colors.col( 7) << 0.5, 0.5, 0.5;
-        colors.col( 8) << 1, 0, 0.5;
-        colors.col( 9) << 1, 0.5, 0;
-        colors.col(10) << 0.5, 1, 0;
-        colors.col(11) << 0.5, 1, 0.5;
+        float alpha, theta = 0.0;
+        for (size_t i = 0; i < nTheta; i++) {
+            for (size_t j = 0; j < nAlpha; j++) {
+                size_t cur_idx = i * nAlpha + j;
+
+                // Torus points
+                float dist = radius + width * cos(alpha);
+                float x = dist * cos(theta);
+                float y = dist * sin(theta);
+                float z = width * sin(alpha);
+                positions.col(cur_idx) << x, y, z;
+                alpha += 2 * M_PI / nAlpha;
+
+                // Triangle indices
+                size_t next_idx = i * nAlpha + (j + 1) % nAlpha;
+                size_t far_idx = (i + 1) % nTheta * nAlpha + j;
+                size_t far_next_idx = (i + 1) % nTheta * nAlpha + (j + 1) % nAlpha;
+                indices.col(2 * cur_idx)     << cur_idx, next_idx, far_next_idx;
+                indices.col(2 * cur_idx + 1) << cur_idx, far_next_idx, far_idx;
+
+                colors.col(2 * cur_idx) << cos(theta), sin(theta), tan(theta);
+                colors.col(2 * cur_idx + 1) << cos(theta), sin(theta), tan(theta);
+            }
+            theta += 2 * M_PI / nTheta;
+        }
 
         mShader.bind();
         mShader.uploadIndices(indices);
@@ -110,7 +108,7 @@ public:
 
         glEnable(GL_DEPTH_TEST);
         /* Draw 12 triangles starting at index 0 */
-        mShader.drawIndexed(GL_TRIANGLES, 0, 12);
+        mShader.drawIndexed(GL_TRIANGLES, 0, 16 * 32);
         glDisable(GL_DEPTH_TEST);
     }
 
