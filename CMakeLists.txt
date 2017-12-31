@@ -26,8 +26,17 @@ if(CMAKE_SYSTEM MATCHES "FreeBSD")
   link_directories( "/usr/local/lib/" )
 endif()
 
+# Include header files
+include_directories(include)
+
+# Compile main maille-designer library
+set(SOURCE_FILES
+  main.cpp
+  include/torus.h src/torus.cpp
+)
+
 # Compile a target using NanoGUI
-add_executable(maille main.cpp)
+add_executable(maille ${SOURCE_FILES})
 
 # Lastly, additional libraries may have been built for you.  In addition to linking
 # against NanoGUI, we need to link against those as well.

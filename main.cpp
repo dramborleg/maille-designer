@@ -6,7 +6,7 @@
 #include <nanogui/common.h>
 
 #include <iostream>
-#include <math.h>
+#include "torus.h"
 #include <string>
 
 using std::endl;
@@ -41,40 +41,10 @@ public:
             "}"
         );
 
-        float radius = 1.2;
-        float width = 0.4;
-        unsigned nTheta = 32;
-        unsigned nAlpha = 8;
-
-        MatrixXf positions(3, nTheta * nAlpha);
-        MatrixXu indices(3, 2 * nAlpha * nTheta);
-        MatrixXf colors(3, 2 * nAlpha * nTheta);
-
-        float alpha, theta = 0.0;
-        for (size_t i = 0; i < nTheta; i++) {
-            for (size_t j = 0; j < nAlpha; j++) {
-                size_t cur_idx = i * nAlpha + j;
-
-                // Torus points
-                float dist = radius + width * cos(alpha);
-                float x = dist * cos(theta);
-                float y = dist * sin(theta);
-                float z = width * sin(alpha);
-                positions.col(cur_idx) << x, y, z;
-                alpha += 2 * M_PI / nAlpha;
-
-                // Triangle indices
-                size_t next_idx = i * nAlpha + (j + 1) % nAlpha;
-                size_t far_idx = (i + 1) % nTheta * nAlpha + j;
-                size_t far_next_idx = (i + 1) % nTheta * nAlpha + (j + 1) % nAlpha;
-                indices.col(2 * cur_idx)     << cur_idx, next_idx, far_next_idx;
-                indices.col(2 * cur_idx + 1) << cur_idx, far_next_idx, far_idx;
-
-                colors.col(2 * cur_idx) << cos(theta), sin(theta), tan(theta);
-                colors.col(2 * cur_idx + 1) << cos(theta), sin(theta), tan(theta);
-            }
-            theta += 2 * M_PI / nTheta;
-        }
+        Torus t(1.2, 0.4, 32, 8);
+        MatrixXf positions = t.get_positions();
+        MatrixXf colors = t.get_colors();
+        MatrixXu indices = t.get_indices();
 
         mShader.bind();
         mShader.uploadIndices(indices);
