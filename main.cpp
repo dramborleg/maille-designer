@@ -14,7 +14,10 @@ using std::endl;
 
 class RingGLCanvas : public nanogui::GLCanvas {
 public:
-    RingGLCanvas(Widget *parent) : nanogui::GLCanvas(parent), mRotation(nanogui::Vector3f(0.25f, 0.5f, 0.33f)) {
+    RingGLCanvas(Widget *parent)
+        : nanogui::GLCanvas(parent),
+        mRotation(nanogui::Vector3f(0.25f, 0.5f, 0.33f)),
+        t(Torus(1.2, 0.4, 128, 32)) {
         using namespace nanogui;
 
         mShader.init(
@@ -24,11 +27,28 @@ public:
             /* Vertex shader */
             "#version 330\n"
             "uniform mat4 modelViewProj;\n"
+            "uniform vec3 viewDirection;\n"
+            "uniform vec3 lDirection;\n"
+            "uniform vec3 ambientIntensity;\n"
+            "uniform vec3 diffuseIntensity;\n"
+            "uniform vec3 specularIntensity;\n"
+            "uniform vec3 ringColor;\n"
+            "uniform float shininess;\n"
             "in vec3 position;\n"
-            "in vec3 color;\n"
+            "in vec3 normal;\n"
             "out vec4 frag_color;\n"
             "void main() {\n"
-            "    frag_color = 3.0 * modelViewProj * vec4(color, 1.0);\n"
+            "    vec3 n = normalize((modelViewProj * vec4(normal, 0.0)).xyz);\n"
+            "    float diffusePrefix = max(dot(lDirection, n), 0);\n"
+            "    vec3 reflection = reflect(lDirection, n);\n"
+            "    float specularPrefix = dot(viewDirection, reflection);\n"
+            "    specularPrefix = pow(max(specularPrefix, 0), shininess);\n"
+            "    vec3 aLight = ringColor * ambientIntensity;\n"
+            "    vec3 dLight = ringColor * diffuseIntensity;\n"
+            "    dLight = diffusePrefix * dLight;\n"
+            "    vec3 sLight = ringColor * specularIntensity;\n"
+            "    sLight = specularPrefix * sLight;\n"
+            "    frag_color = vec4(aLight + dLight + sLight, 1.0);\n"
             "    gl_Position = modelViewProj * vec4(position, 1.0);\n"
             "}",
 
@@ -41,16 +61,21 @@ public:
             "}"
         );
 
-        Torus t(1.2, 0.4, 32, 8);
+        aIntensity = 0.2;
+        dIntensity = 0.4;
+        sIntensity = 0.8;
+        lDirection << -0.4, 0.4, -0.2;
+        lDirection.normalize();
+
         MatrixXf positions = t.get_positions();
-        MatrixXf colors = t.get_colors();
+        MatrixXf normals = t.get_normals();
         MatrixXu indices = t.get_indices();
 
         mShader.bind();
         mShader.uploadIndices(indices);
 
         mShader.uploadAttrib("position", positions);
-        mShader.uploadAttrib("color", colors);
+        mShader.uploadAttrib("normal", normals);
     }
 
     ~RingGLCanvas() {
@@ -73,18 +98,41 @@ public:
             Eigen::AngleAxisf(mRotation[0]*fTime, Vector3f::UnitX()) *
             Eigen::AngleAxisf(mRotation[1]*fTime,  Vector3f::UnitY()) *
             Eigen::AngleAxisf(mRotation[2]*fTime, Vector3f::UnitZ()));
-
         mShader.setUniform("modelViewProj", mvp);
+
+        // set up view direction and light color (white light, not fully on)
+        Eigen::Vector3f viewDirection(0, 0, 1);
+        viewDirection.normalize();
+        Eigen::Vector3f ambientIntensity(aIntensity, aIntensity, aIntensity);
+        Eigen::Vector3f diffuseIntensity(dIntensity, dIntensity, dIntensity);
+        Eigen::Vector3f specularIntensity(sIntensity, sIntensity, sIntensity);
+        mShader.setUniform("ambientIntensity", ambientIntensity);
+        mShader.setUniform("diffuseIntensity", diffuseIntensity);
+        mShader.setUniform("specularIntensity", specularIntensity);
+        mShader.setUniform("viewDirection", viewDirection);
+        mShader.setUniform("lDirection", lDirection);
+
+        // specify color for this ring
+        Eigen::Vector3f ringColor(0.8, 0.0, 0.0);
+        mShader.setUniform("ringColor", ringColor);
+        mShader.setUniform("shininess", 8.0);
 
         glEnable(GL_DEPTH_TEST);
         /* Draw 12 triangles starting at index 0 */
-        mShader.drawIndexed(GL_TRIANGLES, 0, 16 * 32);
+        unsigned num_samples = t.get_num_samples_radius() * t.get_num_samples_cross_section();
+        mShader.drawIndexed(GL_TRIANGLES, 0, 2 * num_samples);
         glDisable(GL_DEPTH_TEST);
     }
 
 private:
     nanogui::GLShader mShader;
     Eigen::Vector3f mRotation;
+    // torus to draw
+    Torus t;
+    // direction for our directional light
+    Eigen::Vector3f lDirection;
+    // ambient, diffuse, and specular light intensities
+    float aIntensity, dIntensity, sIntensity;
 };
 
 
