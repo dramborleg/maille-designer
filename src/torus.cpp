@@ -2,8 +2,10 @@
 
 Torus::Torus(float radius, float thickness, unsigned numSamplesRadius,
              unsigned numSamplesCrossSection)
-    : radius(radius), thickness(thickness), nTheta(numSamplesRadius),
-      nAlpha(numSamplesCrossSection)
+    : radius(radius)
+    , thickness(thickness)
+    , nTheta(numSamplesRadius)
+    , nAlpha(numSamplesCrossSection)
 {
     positions = nanogui::MatrixXf(3, nTheta * nAlpha);
     normals = nanogui::MatrixXf(3, nTheta * nAlpha);
@@ -36,7 +38,7 @@ Torus::Torus(float radius, float thickness, unsigned numSamplesRadius,
             size_t next_idx = i * nAlpha + (j + 1) % nAlpha;
             size_t far_idx = (i + 1) % nTheta * nAlpha + j;
             size_t far_next_idx = (i + 1) % nTheta * nAlpha + (j + 1) % nAlpha;
-            indices.col(2 * cur_idx)     << cur_idx, next_idx, far_next_idx;
+            indices.col(2 * cur_idx) << cur_idx, next_idx, far_next_idx;
             indices.col(2 * cur_idx + 1) << cur_idx, far_next_idx, far_idx;
         }
         theta += 2 * M_PI / nTheta;
