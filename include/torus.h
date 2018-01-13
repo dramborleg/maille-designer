@@ -5,14 +5,17 @@
 class Torus
 {
 public:
+    Torus() {}
     Torus(float radius, float thickness, unsigned numSamplesRadius = 128,
           unsigned numSamplesCrossSection = 32);
 
     const nanogui::MatrixXf &get_positions() const { return positions; }
     const nanogui::MatrixXf &get_normals() const { return normals; }
     const nanogui::MatrixXu &get_indices() const { return indices; }
-    const unsigned &get_num_samples_radius() const { return nTheta; }
-    const unsigned &get_num_samples_cross_section() const { return nAlpha; }
+    unsigned get_num_samples_radius() const { return nTheta; }
+    unsigned get_num_samples_cross_section() const { return nAlpha; }
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
     float radius;
