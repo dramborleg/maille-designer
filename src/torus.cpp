@@ -1,11 +1,14 @@
 #include "torus.h"
 
 Torus::Torus(float radius, float thickness, unsigned numSamplesRadius,
-             unsigned numSamplesCrossSection)
+             unsigned numSamplesCrossSection, float shininess,
+             nanogui::Vector3f color)
     : radius(radius)
     , thickness(thickness)
     , nTheta(numSamplesRadius)
     , nAlpha(numSamplesCrossSection)
+    , shininess(shininess)
+    , color(color)
 {
     positions = nanogui::MatrixXf(3, nTheta * nAlpha);
     normals = nanogui::MatrixXf(3, nTheta * nAlpha);

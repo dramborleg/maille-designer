@@ -17,7 +17,6 @@ public:
     RingGLCanvas(Widget *parent)
         : nanogui::GLCanvas(parent)
         , mRotation(nanogui::Vector3f(0.25f, 0.5f, 0.33f))
-        , t(Torus(1.2, 0.4, 128, 32))
     {
         using namespace nanogui;
 
@@ -67,9 +66,11 @@ public:
         lDirection << -0.4, 0.4, -0.2;
         lDirection.normalize();
 
-        MatrixXf positions = t.get_positions();
-        MatrixXf normals = t.get_normals();
-        MatrixXu indices = t.get_indices();
+        rings.push_back(
+            Torus(1.2, 0.4, 128, 32, 8.0, Eigen::Vector3f(0.8, 0.0, 0.0)));
+        MatrixXf positions = rings[0].get_positions();
+        MatrixXf normals = rings[0].get_normals();
+        MatrixXu indices = rings[0].get_indices();
 
         mShader.bind();
         mShader.uploadIndices(indices);
@@ -111,15 +112,14 @@ public:
         mShader.setUniform("viewDirection", viewDirection);
         mShader.setUniform("lDirection", lDirection);
 
-        // specify color for this ring
-        Eigen::Vector3f ringColor(0.8, 0.0, 0.0);
-        mShader.setUniform("ringColor", ringColor);
-        mShader.setUniform("shininess", 8.0);
+        // set ring color and shininess
+        mShader.setUniform("ringColor", rings[0].get_color());
+        mShader.setUniform("shininess", rings[0].get_shininess());
 
         glEnable(GL_DEPTH_TEST);
         /* Draw 12 triangles starting at index 0 */
-        unsigned num_samples =
-            t.get_num_samples_radius() * t.get_num_samples_cross_section();
+        unsigned num_samples = rings[0].get_num_samples_radius() *
+                               rings[0].get_num_samples_cross_section();
         mShader.drawIndexed(GL_TRIANGLES, 0, 2 * num_samples);
         glDisable(GL_DEPTH_TEST);
     }
@@ -127,8 +127,8 @@ public:
 private:
     nanogui::GLShader mShader;
     Eigen::Vector3f mRotation;
-    // torus to draw
-    Torus t;
+    // rings to draw
+    std::vector<Torus> rings;
     // direction for our directional light
     Eigen::Vector3f lDirection;
     // ambient, diffuse, and specular light intensities
