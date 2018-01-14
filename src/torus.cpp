@@ -8,9 +8,11 @@ Torus::Torus(float radius, float thickness, unsigned numSamplesRadius,
     , nTheta(numSamplesRadius)
     , nAlpha(numSamplesCrossSection)
     , shininess(shininess)
+    , rotation(nanogui::Matrix4f::Identity())
+    , translation(nanogui::Matrix4f::Identity())
     , color(color)
 {
-    positions = nanogui::MatrixXf(3, nTheta * nAlpha);
+    positions = nanogui::MatrixXf(4, nTheta * nAlpha);
     normals = nanogui::MatrixXf(3, nTheta * nAlpha);
     indices = nanogui::MatrixXu(3, 2 * nAlpha * nTheta);
 
@@ -29,7 +31,7 @@ Torus::Torus(float radius, float thickness, unsigned numSamplesRadius,
             float x = dist * cos(theta);
             float y = dist * sin(theta);
             float z = thickness * sin(alpha);
-            positions.col(cur_idx) << x, y, z;
+            positions.col(cur_idx) << x, y, z, 1.0;
 
             // Find normal
             nanogui::Vector3f n(x - xcenter, y - ycenter, z - zcenter);
@@ -46,4 +48,34 @@ Torus::Torus(float radius, float thickness, unsigned numSamplesRadius,
         }
         theta += 2 * M_PI / nTheta;
     }
+}
+
+nanogui::MatrixXf Torus::get_positions() const
+{
+    nanogui::MatrixXf transformed_points(4, nTheta * nAlpha);
+    nanogui::Matrix4f transformation = translation * rotation;
+
+    for (size_t i = 0; i < positions.cols(); i++) {
+        transformed_points.col(i) = transformation * positions.col(i);
+    }
+
+    return transformed_points;
+}
+
+nanogui::MatrixXf Torus::get_normals() const
+{
+    nanogui::MatrixXf transformed_normals(3, nTheta * nAlpha);
+
+    for (size_t i = 0; i < normals.cols(); i++) {
+        transformed_normals.col(i) =
+            rotation.topLeftCorner(3, 3) * normals.col(i);
+    }
+
+    return transformed_normals;
+}
+
+void Torus::set_center(float x, float y)
+{
+    translation(0, 3) = x;
+    translation(1, 3) = y;
 }
