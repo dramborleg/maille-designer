@@ -1,13 +1,13 @@
 #include "torus.h"
 
-Torus::Torus(float radius, float thickness, unsigned numSamplesRadius,
+Torus::Torus(float radius, float torus_thickness, unsigned numSamplesRadius,
              unsigned numSamplesCrossSection, float shininess,
              nanogui::Vector3f color)
-    : radius(radius)
-    , thickness(thickness)
+    : r(radius)
+    , shininess(shininess)
+    , thickness(torus_thickness)
     , nTheta(numSamplesRadius)
     , nAlpha(numSamplesCrossSection)
-    , shininess(shininess)
     , rotation(nanogui::Matrix4f::Identity())
     , translation(nanogui::Matrix4f::Identity())
     , color(color)
@@ -16,18 +16,19 @@ Torus::Torus(float radius, float thickness, unsigned numSamplesRadius,
     normals = nanogui::MatrixXf(3, nTheta * nAlpha);
     indices = nanogui::MatrixXu(3, 2 * nAlpha * nTheta);
 
-    float alpha, theta = 0.0;
+    float alpha = 0.0;
+    float theta = 0.0;
     for (size_t i = 0; i < nTheta; i++) {
         // find center coordinates of torus for calculating normal
-        float xcenter = radius * cos(theta);
-        float ycenter = radius * sin(theta);
+        float xcenter = r * cos(theta);
+        float ycenter = r * sin(theta);
         float zcenter = 0.0;
 
         for (size_t j = 0; j < nAlpha; j++) {
             size_t cur_idx = i * nAlpha + j;
 
             // Torus points
-            float dist = radius + thickness * cos(alpha);
+            float dist = r + thickness * cos(alpha);
             float x = dist * cos(theta);
             float y = dist * sin(theta);
             float z = thickness * sin(alpha);

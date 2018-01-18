@@ -23,7 +23,7 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
-    float radius;
+    float r;
     float shininess;
     float thickness;
     unsigned nTheta;

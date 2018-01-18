@@ -33,7 +33,15 @@ include_directories(include)
 set(SOURCE_FILES
   main.cpp
   include/torus.h src/torus.cpp
+  include/ringglcanvas.h src/ringglcanvas.cpp
 )
+
+# Enable warnings for our source files
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-Wall -Werror")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-W4 -WX")
+endif()
 
 # Compile a target using NanoGUI
 add_executable(maille ${SOURCE_FILES})
