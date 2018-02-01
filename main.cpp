@@ -19,15 +19,10 @@ public:
     {
         using namespace nanogui;
 
-        Window *window = new Window(this, "Design");
-        window->setPosition(Vector2i(100, 0));
-        // window->setLayout(new GroupLayout());
-
-        mCanvas = new RingGLCanvas(window);
+        mCanvas = new RingGLCanvas(this);
+        mCanvas->setPosition(Vector2i(200, 0));
         mCanvas->setBackgroundColor({100, 100, 100, 255});
         mCanvas->setSize({600, 600});
-
-        // performLayout();
     }
 
     virtual void draw(NVGcontext *ctx)
