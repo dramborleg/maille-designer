@@ -1,8 +1,11 @@
 #include <nanogui/common.h>
 #include <nanogui/glcanvas.h>
 #include <nanogui/glutil.h>
+#include <nanogui/label.h>
+#include <nanogui/layout.h>
 #include <nanogui/object.h>
 #include <nanogui/screen.h>
+#include <nanogui/slider.h>
 #include <nanogui/window.h>
 
 #include "ringglcanvas.h"
@@ -23,6 +26,18 @@ public:
         mCanvas->setPosition(Vector2i(200, 0));
         mCanvas->setBackgroundColor({100, 100, 100, 255});
         mCanvas->setSize({600, 600});
+
+        Window *controls = new Window(this, "Controls");
+        controls->setPosition(Vector2i(16, 16));
+        controls->setLayout(new GroupLayout());
+        new Label(controls, "Brightness Slider", "sans-bold");
+        Slider *brightness = new Slider(controls);
+        brightness->setTooltip("Set ambient brightness multiplier");
+        brightness->setValue(mCanvas->getAmbientIntensityFactor());
+        brightness->setCallback(
+            [this](float val) { mCanvas->setAmbientIntensityFactor(val); });
+
+        performLayout();
     }
 
     virtual void draw(NVGcontext *ctx)

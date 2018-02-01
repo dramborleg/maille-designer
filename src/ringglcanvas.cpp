@@ -45,7 +45,8 @@ RingGLCanvas::RingGLCanvas(Widget *parent)
         "    color = frag_color;\n"
         "}");
 
-    aIntensity = 0.2;
+    aiFactor = 0.5;
+    aIntensity = 0.6;
     dIntensity = 0.4;
     sIntensity = 0.8;
     lDirection << -0.4, 0.4, -0.2;
@@ -121,7 +122,8 @@ void RingGLCanvas::drawGL()
     // set up view direction and light color (white light, not fully on)
     Eigen::Vector3f viewDirection(0, 0, 1);
     viewDirection.normalize();
-    Eigen::Vector3f ambientIntensity(aIntensity, aIntensity, aIntensity);
+    float ai = aIntensity * aiFactor;
+    Eigen::Vector3f ambientIntensity(ai, ai, ai);
     Eigen::Vector3f diffuseIntensity(dIntensity, dIntensity, dIntensity);
     Eigen::Vector3f specularIntensity(sIntensity, sIntensity, sIntensity);
     mShader.setUniform("ambientIntensity", ambientIntensity);

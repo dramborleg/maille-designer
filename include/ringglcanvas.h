@@ -10,6 +10,9 @@ public:
     RingGLCanvas(Widget *parent);
     ~RingGLCanvas() { mShader.free(); }
 
+    void setAmbientIntensityFactor(float iFactor) { aiFactor = iFactor; }
+    float getAmbientIntensityFactor() const { return aiFactor; }
+
     virtual void drawGL() override;
 
 private:
@@ -20,4 +23,5 @@ private:
     Eigen::Vector3f lDirection;
     // ambient, diffuse, and specular light intensities
     float aIntensity, dIntensity, sIntensity;
+    float aiFactor;
 };
