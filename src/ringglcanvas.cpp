@@ -108,6 +108,34 @@ RingGLCanvas::RingGLCanvas(Widget *parent)
     mShader.uploadAttrib("normal", normals);
 }
 
+bool RingGLCanvas::mouseButtonEvent(const Eigen::Vector2i &p, int button,
+                                    bool down, int modifiers)
+{
+    requestFocus();
+    std::cout << "point: " << p << "button: " << button << "down: " << down
+              << "modifiers" << modifiers << std::endl;
+    std::cout << "absolute position: " << absolutePosition() << std::endl;
+    return false;
+}
+
+bool RingGLCanvas::mouseDragEvent(const Eigen::Vector2i &p,
+                                  const Eigen::Vector2i &rel, int button,
+                                  int modifiers)
+{
+    std::cout << "point: " << p << "rel: " << rel << "button: " << button
+              << "modifiers" << modifiers << std::endl;
+    return true;
+}
+
+bool RingGLCanvas::keyboardEvent(int key, int scancode, int action,
+                                 int modifiers)
+{
+    std::cout << "key: " << key << "scancode: " << scancode
+              << "action: " << action << "modifiers: " << modifiers
+              << std::endl;
+    return false;
+}
+
 void RingGLCanvas::drawGL()
 {
     using namespace nanogui;
