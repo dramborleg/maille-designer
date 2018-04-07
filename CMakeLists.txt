@@ -19,6 +19,24 @@ add_definitions(${NANOGUI_EXTRA_DEFS})
 # On top of adding the path to nanogui/include, you may need extras
 include_directories(${NANOGUI_EXTRA_INCS})
 
+# Always use libc++ on Clang
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  if (HAS_LIBCPP)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++")
+    if(HAS_LIBCPPABI)
+      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++abi")
+      set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -lc++abi")
+      message(STATUS "maille-designer: using libc++ and libc++abi.")
+    else()
+      message(STATUS "maille-designer: using libc++.")
+    endif()
+  else()
+    message(STATUS "maille-designer: NOT using libc++.")
+  endif()
+endif()
+
 # Include OpenGL directories for FreeBSD
 if(CMAKE_SYSTEM MATCHES "FreeBSD")
   find_package(OpenGL REQUIRED)
@@ -37,14 +55,19 @@ set(SOURCE_FILES
 )
 
 # Enable warnings for our source files
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-Wall -Werror")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-Wall -Wextra")
+elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-Weverything -Wno-padded")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-W4 -WX")
 endif()
 
 # Compile a target using NanoGUI
 add_executable(maille ${SOURCE_FILES})
+
+# Useful for debugging build errors
+set(CMAKE_EXE_LINKER_FLAGS "-v")
 
 # Lastly, additional libraries may have been built for you.  In addition to linking
 # against NanoGUI, we need to link against those as well.
