@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Eigen/Core>
 #include <nanogui/glcanvas.h>
 
 #include "torus.h"
@@ -19,11 +20,14 @@ public:
                                 int modifiers) override;
     virtual bool keyboardEvent(int key, int scancode, int action,
                                int modifiers) override;
+    virtual bool scrollEvent(const Eigen::Vector2i &p, const Eigen::Vector2f &rel) override;
 
     virtual void drawGL() override;
 
 private:
     nanogui::GLShader mShader;
+    // model view projection matrix
+    Eigen::Matrix4f mvp;
     // rings to draw
     std::vector<Torus> rings;
     // direction for our directional light

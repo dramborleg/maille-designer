@@ -52,6 +52,9 @@ RingGLCanvas::RingGLCanvas(Widget *parent)
     lDirection << -0.4, 0.4, -0.2;
     lDirection.normalize();
 
+    mvp.setIdentity();
+    mvp(3, 3) = 8.0;
+
     rings.push_back(
         Torus(1.2, 0.4, 128, 32, 8.0, Eigen::Vector3f(0.8, 0.0, 0.0)));
     rings[0].set_center(-2.5, 0.0);
@@ -136,15 +139,23 @@ bool RingGLCanvas::keyboardEvent(int key, int scancode, int action,
     return false;
 }
 
+bool RingGLCanvas::scrollEvent(const Eigen::Vector2i &p, const Eigen::Vector2f &rel)
+{
+    std::cout << "p: " << p << "rel: " << rel << std::endl;
+    if (rel(1) > 0) {
+        mvp(3, 3) -= 0.4;
+    } else if (rel(1) < 0) {
+        mvp(3, 3) += 0.4;
+    }
+    return false;
+}
+
 void RingGLCanvas::drawGL()
 {
     using namespace nanogui;
 
     mShader.bind();
 
-    Matrix4f mvp;
-    mvp.setIdentity();
-    mvp(3, 3) = 8.0;
     mShader.setUniform("modelViewProj", mvp);
 
     // set up view direction and light color (white light, not fully on)
