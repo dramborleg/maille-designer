@@ -50,6 +50,7 @@ include_directories(src)
 # Compile main maille-designer library
 set(SOURCE_FILES
   main.cpp
+  src/mailleinlay.h
   src/torus.h src/torus.cpp
   src/ringglcanvas.h src/ringglcanvas.cpp
   src/maillescreen.h src/maillescreen.cpp

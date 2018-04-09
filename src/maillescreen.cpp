@@ -12,7 +12,8 @@ MailleScreen::MailleScreen()
 {
     using namespace nanogui;
 
-    mCanvas = new RingGLCanvas(this);
+    MailleInlay inlay = createSampleInlay();
+    mCanvas = new RingGLCanvas(this, inlay);
     mCanvas->setPosition(Vector2i(200, 0));
     mCanvas->setBackgroundColor({100, 100, 100, 255});
     mCanvas->setSize({600, 600});
@@ -34,4 +35,36 @@ void MailleScreen::draw(NVGcontext *ctx)
 {
     /* Draw the user interface */
     Screen::draw(ctx);
+}
+
+MailleInlay MailleScreen::createSampleInlay()
+{
+    MailleInlay inlay;
+
+    inlay.rings.push_back(
+        Torus(1.2, 0.4, 128, 32, 8.0, Eigen::Vector3f(0.8, 0.0, 0.0)));
+    inlay.rings[0].set_center(-2.5, 0.0);
+    inlay.rings.push_back(
+        Torus(1.2, 0.4, 128, 32, 8.0, Eigen::Vector3f(0.8, 0.4, 0.0)));
+    inlay.rings[1].set_center(1.5, 0.0);
+    Eigen::Matrix4f rot = Eigen::Matrix4f::Identity();
+    rot(1, 1) = cos(M_PI * 0.25);
+    rot(2, 2) = cos(M_PI * 0.25);
+    rot(1, 2) = -sin(M_PI * 0.25);
+    rot(2, 1) = sin(M_PI * 0.25);
+    inlay.rings[1].set_rotation(rot);
+    inlay.rings.push_back(
+        Torus(1.2, 0.4, 128, 32, 8.0, Eigen::Vector3f(0.8, 0.4, 0.2)));
+    inlay.rings[2].set_center(5.5, 0.0);
+    rot.setIdentity();
+    rot(1, 1) = cos(M_PI * -0.25);
+    rot(2, 2) = cos(M_PI * -0.25);
+    rot(1, 2) = -sin(M_PI * -0.25);
+    rot(2, 1) = sin(M_PI * -0.25);
+    inlay.rings[2].set_rotation(rot);
+
+    inlay.ambientIntensity = 0.5;
+    inlay.ringsModified = true;
+
+    return inlay;
 }

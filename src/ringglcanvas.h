@@ -3,16 +3,16 @@
 #include <Eigen/Core>
 #include <nanogui/glcanvas.h>
 
-#include "torus.h"
+#include "mailleinlay.h"
 
 class RingGLCanvas : public nanogui::GLCanvas
 {
 public:
-    RingGLCanvas(Widget *parent);
+    RingGLCanvas(Widget *parent, MailleInlay inlay);
     ~RingGLCanvas() { mShader.free(); }
 
-    void setAmbientIntensityFactor(float iFactor) { aiFactor = iFactor; }
-    float getAmbientIntensityFactor() const { return aiFactor; }
+    void setAmbientIntensityFactor(float iFactor);
+    float getAmbientIntensityFactor() const { return inlay.ambientIntensity; }
     virtual bool mouseButtonEvent(const Eigen::Vector2i &p, int button,
                                   bool down, int modifiers) override;
     virtual bool mouseDragEvent(const Eigen::Vector2i &p,
@@ -29,11 +29,10 @@ private:
     nanogui::GLShader mShader;
     // model view projection matrix
     Eigen::Matrix4f mvp;
-    // rings to draw
-    std::vector<Torus> rings;
     // direction for our directional light
     Eigen::Vector3f lDirection;
     // ambient, diffuse, and specular light intensities
     float aIntensity, dIntensity, sIntensity;
-    float aiFactor;
+    // the inlay being displayed on this canvas
+    MailleInlay inlay;
 };

@@ -1,7 +1,8 @@
 #include "ringglcanvas.h"
 
-RingGLCanvas::RingGLCanvas(Widget *parent)
+RingGLCanvas::RingGLCanvas(Widget *parent, MailleInlay inlay)
     : nanogui::GLCanvas(parent)
+    , inlay(inlay)
 {
     using namespace nanogui;
 
@@ -45,7 +46,6 @@ RingGLCanvas::RingGLCanvas(Widget *parent)
         "    color = frag_color;\n"
         "}");
 
-    aiFactor = 0.5;
     aIntensity = 0.6;
     dIntensity = 0.4;
     sIntensity = 0.8;
@@ -55,36 +55,14 @@ RingGLCanvas::RingGLCanvas(Widget *parent)
     mvp.setIdentity();
     mvp(3, 3) = 8.0;
 
-    rings.push_back(
-        Torus(1.2, 0.4, 128, 32, 8.0, Eigen::Vector3f(0.8, 0.0, 0.0)));
-    rings[0].set_center(-2.5, 0.0);
-    rings.push_back(
-        Torus(1.2, 0.4, 128, 32, 8.0, Eigen::Vector3f(0.8, 0.4, 0.0)));
-    rings[1].set_center(1.5, 0.0);
-    Eigen::Matrix4f rot = Eigen::Matrix4f::Identity();
-    rot(1, 1) = cos(M_PI * 0.25);
-    rot(2, 2) = cos(M_PI * 0.25);
-    rot(1, 2) = -sin(M_PI * 0.25);
-    rot(2, 1) = sin(M_PI * 0.25);
-    rings[1].set_rotation(rot);
-    rings.push_back(
-        Torus(1.2, 0.4, 128, 32, 8.0, Eigen::Vector3f(0.8, 0.4, 0.2)));
-    rings[2].set_center(5.5, 0.0);
-    rot.setIdentity();
-    rot(1, 1) = cos(M_PI * -0.25);
-    rot(2, 2) = cos(M_PI * -0.25);
-    rot(1, 2) = -sin(M_PI * -0.25);
-    rot(2, 1) = sin(M_PI * -0.25);
-    rings[2].set_rotation(rot);
-
     MatrixXf positions, cur_positions;
     MatrixXf normals, cur_normals;
     MatrixXu indices, cur_indices;
-    for (size_t i = 0; i < rings.size(); i++)
+    for (size_t i = 0; i < inlay.rings.size(); i++)
     {
         // append indices
         size_t num_cols = indices.cols();
-        cur_indices = rings[i].get_indices();
+        cur_indices = inlay.rings[i].get_indices();
         indices.conservativeResize(3, indices.cols() + cur_indices.cols());
         indices.topRightCorner(3, cur_indices.cols()) = cur_indices;
         for (size_t x = 0; x < indices.rows(); x++)
@@ -96,13 +74,13 @@ RingGLCanvas::RingGLCanvas(Widget *parent)
         }
 
         // append positions
-        cur_positions = rings[i].get_positions();
+        cur_positions = inlay.rings[i].get_positions();
         positions.conservativeResize(4,
                                      positions.cols() + cur_positions.cols());
         positions.topRightCorner(4, cur_positions.cols()) = cur_positions;
 
         // append normals
-        cur_normals = rings[i].get_normals();
+        cur_normals = inlay.rings[i].get_normals();
         normals.conservativeResize(3, normals.cols() + cur_normals.cols());
         normals.topRightCorner(3, cur_normals.cols()) = cur_normals;
     }
@@ -168,7 +146,7 @@ void RingGLCanvas::drawGL()
     // set up view direction and light color (white light, not fully on)
     Eigen::Vector3f viewDirection(0, 0, 1);
     viewDirection.normalize();
-    float ai = aIntensity * aiFactor;
+    float ai = aIntensity * inlay.ambientIntensity;
     Eigen::Vector3f ambientIntensity(ai, ai, ai);
     Eigen::Vector3f diffuseIntensity(dIntensity, dIntensity, dIntensity);
     Eigen::Vector3f specularIntensity(sIntensity, sIntensity, sIntensity);
@@ -181,17 +159,22 @@ void RingGLCanvas::drawGL()
     glEnable(GL_DEPTH_TEST);
 
     uint32_t offset = 0;
-    for (size_t i = 0; i < rings.size(); i++)
+    for (size_t i = 0; i < inlay.rings.size(); i++)
     {
         // set ring color and shininess
-        mShader.setUniform("ringColor", rings[i].get_color());
-        mShader.setUniform("shininess", rings[i].get_shininess());
+        mShader.setUniform("ringColor", inlay.rings[i].get_color());
+        mShader.setUniform("shininess", inlay.rings[i].get_shininess());
 
-        unsigned count = 2 * rings[i].get_num_samples_radius() *
-                         rings[i].get_num_samples_cross_section();
+        unsigned count = 2 * inlay.rings[i].get_num_samples_radius() *
+                         inlay.rings[i].get_num_samples_cross_section();
         mShader.drawIndexed(GL_TRIANGLES, offset, count);
         offset += count;
     }
 
     glDisable(GL_DEPTH_TEST);
+}
+
+void RingGLCanvas::setAmbientIntensityFactor(float iFactor)
+{
+    inlay.ambientIntensity = iFactor;
 }
