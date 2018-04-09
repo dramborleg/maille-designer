@@ -54,6 +54,8 @@ set(SOURCE_FILES
   src/torus.h src/torus.cpp
   src/ringglcanvas.h src/ringglcanvas.cpp
   src/maillescreen.h src/maillescreen.cpp
+  src/tools/tool.h
+  src/tools/simpleaddtool.h src/tools/simpleaddtool.cpp
 )
 
 # Enable warnings for our source files

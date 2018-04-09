@@ -5,10 +5,13 @@
 
 #include "mailleinlay.h"
 
+class Tool;
+
 class RingGLCanvas : public nanogui::GLCanvas
 {
 public:
-    RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay);
+    RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
+                 std::shared_ptr<Tool> tool);
     ~RingGLCanvas() { mShader.free(); }
 
     void setAmbientIntensityFactor(float iFactor);
@@ -26,6 +29,8 @@ public:
     virtual void drawGL() override;
 
 private:
+    void uploadRingData();
+
     nanogui::GLShader mShader;
     // model view projection matrix
     Eigen::Matrix4f mvp;
@@ -35,4 +40,6 @@ private:
     float aIntensity, dIntensity, sIntensity;
     // the inlay being displayed on this canvas
     std::shared_ptr<MailleInlay> inlay;
+    // currently selected tool
+    std::shared_ptr<Tool> tool;
 };

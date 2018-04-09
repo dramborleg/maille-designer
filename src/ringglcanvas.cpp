@@ -1,11 +1,12 @@
 #include "ringglcanvas.h"
+#include "tools/tool.h"
 
-RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay)
+RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
+                           std::shared_ptr<Tool> tool)
     : nanogui::GLCanvas(parent)
     , inlay(inlay)
+    , tool(tool)
 {
-    using namespace nanogui;
-
     mShader.init(
         /* An identifying name */
         "a_simple_shader",
@@ -54,10 +55,13 @@ RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay)
 
     mvp.setIdentity();
     mvp(3, 3) = 8.0;
+}
 
-    MatrixXf positions, cur_positions;
-    MatrixXf normals, cur_normals;
-    MatrixXu indices, cur_indices;
+void RingGLCanvas::uploadRingData()
+{
+    nanogui::MatrixXf positions, cur_positions;
+    nanogui::MatrixXf normals, cur_normals;
+    nanogui::MatrixXu indices, cur_indices;
     for (size_t i = 0; i < inlay->rings.size(); i++)
     {
         // append indices
@@ -99,6 +103,9 @@ bool RingGLCanvas::mouseButtonEvent(const Eigen::Vector2i &p, int button,
     std::cout << "point: " << p << "button: " << button << "down: " << down
               << "modifiers" << modifiers << std::endl;
     std::cout << "absolute position: " << absolutePosition() << std::endl;
+    if (tool)
+        return tool->mouseButtonEvent(p, button, down, modifiers, inlay);
+
     return false;
 }
 
@@ -108,7 +115,10 @@ bool RingGLCanvas::mouseDragEvent(const Eigen::Vector2i &p,
 {
     std::cout << "point: " << p << "rel: " << rel << "button: " << button
               << "modifiers" << modifiers << std::endl;
-    return true;
+    if (tool)
+        tool->mouseDragEvent(p, rel, button, modifiers, inlay);
+
+    return false;
 }
 
 bool RingGLCanvas::keyboardEvent(int key, int scancode, int action,
@@ -138,6 +148,12 @@ bool RingGLCanvas::scrollEvent(const Eigen::Vector2i &p,
 void RingGLCanvas::drawGL()
 {
     using namespace nanogui;
+
+    if (inlay->ringsModified)
+    {
+        uploadRingData();
+        inlay->ringsModified = false;
+    }
 
     mShader.bind();
 

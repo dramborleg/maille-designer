@@ -17,4 +17,5 @@ private:
     std::shared_ptr<MailleInlay> createSampleInlay();
 
     RingGLCanvas *mCanvas;
+    std::shared_ptr<MailleInlay> inlay;
 };

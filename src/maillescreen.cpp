@@ -1,19 +1,22 @@
 #include <nanogui/label.h>
 #include <nanogui/layout.h>
+#include <nanogui/nanogui.h>
 #include <nanogui/screen.h>
 #include <nanogui/slider.h>
 #include <nanogui/window.h>
 
 #include "maillescreen.h"
 #include "ringglcanvas.h"
+#include "tools/simpleaddtool.h"
 
 MailleScreen::MailleScreen()
     : nanogui::Screen(Eigen::Vector2i(800, 600), "Maille Designer", false)
 {
     using namespace nanogui;
 
-    std::shared_ptr<MailleInlay> inlay = createSampleInlay();
-    mCanvas = new RingGLCanvas(this, inlay);
+    inlay = createSampleInlay();
+    std::shared_ptr<Tool> tool(new SimpleAddTool(ENTYPO_ICON_ADD_TO_LIST));
+    mCanvas = new RingGLCanvas(this, inlay, tool);
     mCanvas->setPosition(Vector2i(200, 0));
     mCanvas->setBackgroundColor({100, 100, 100, 255});
     mCanvas->setSize({600, 600});
