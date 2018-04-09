@@ -60,7 +60,7 @@ set(SOURCE_FILES
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-Wall -Wextra")
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-Weverything -Wno-padded")
+  set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-Wall")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-W4 -WX")
 endif()

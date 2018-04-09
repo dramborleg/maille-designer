@@ -14,7 +14,7 @@ public:
     virtual void draw(NVGcontext *ctx);
 
 private:
-    MailleInlay createSampleInlay();
+    std::shared_ptr<MailleInlay> createSampleInlay();
 
     RingGLCanvas *mCanvas;
 };

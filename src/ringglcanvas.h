@@ -8,11 +8,11 @@
 class RingGLCanvas : public nanogui::GLCanvas
 {
 public:
-    RingGLCanvas(Widget *parent, MailleInlay inlay);
+    RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay);
     ~RingGLCanvas() { mShader.free(); }
 
     void setAmbientIntensityFactor(float iFactor);
-    float getAmbientIntensityFactor() const { return inlay.ambientIntensity; }
+    float getAmbientIntensityFactor() const { return inlay->ambientIntensity; }
     virtual bool mouseButtonEvent(const Eigen::Vector2i &p, int button,
                                   bool down, int modifiers) override;
     virtual bool mouseDragEvent(const Eigen::Vector2i &p,
@@ -34,5 +34,5 @@ private:
     // ambient, diffuse, and specular light intensities
     float aIntensity, dIntensity, sIntensity;
     // the inlay being displayed on this canvas
-    MailleInlay inlay;
+    std::shared_ptr<MailleInlay> inlay;
 };
