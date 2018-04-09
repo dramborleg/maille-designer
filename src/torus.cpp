@@ -18,13 +18,15 @@ Torus::Torus(float radius, float torus_thickness, unsigned numSamplesRadius,
 
     float alpha = 0.0;
     float theta = 0.0;
-    for (size_t i = 0; i < nTheta; i++) {
+    for (size_t i = 0; i < nTheta; i++)
+    {
         // find center coordinates of torus for calculating normal
         float xcenter = r * cos(theta);
         float ycenter = r * sin(theta);
         float zcenter = 0.0;
 
-        for (size_t j = 0; j < nAlpha; j++) {
+        for (size_t j = 0; j < nAlpha; j++)
+        {
             size_t cur_idx = i * nAlpha + j;
 
             // Torus points
@@ -56,7 +58,8 @@ nanogui::MatrixXf Torus::get_positions() const
     nanogui::MatrixXf transformed_points(4, nTheta * nAlpha);
     nanogui::Matrix4f transformation = translation * rotation;
 
-    for (size_t i = 0; i < positions.cols(); i++) {
+    for (size_t i = 0; i < positions.cols(); i++)
+    {
         transformed_points.col(i) = transformation * positions.col(i);
     }
 
@@ -67,7 +70,8 @@ nanogui::MatrixXf Torus::get_normals() const
 {
     nanogui::MatrixXf transformed_normals(3, nTheta * nAlpha);
 
-    for (size_t i = 0; i < normals.cols(); i++) {
+    for (size_t i = 0; i < normals.cols(); i++)
+    {
         transformed_normals.col(i) =
             rotation.topLeftCorner(3, 3) * normals.col(i);
     }

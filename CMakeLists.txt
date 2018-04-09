@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 include_directories(ext/nanogui/include)
 
 # Disable building extras we won't need (pure C++ project)
@@ -45,20 +45,24 @@ if(CMAKE_SYSTEM MATCHES "FreeBSD")
 endif()
 
 # Include header files
-include_directories(include)
+include_directories(src)
 
 # Compile main maille-designer library
 set(SOURCE_FILES
   main.cpp
-  include/torus.h src/torus.cpp
-  include/ringglcanvas.h src/ringglcanvas.cpp
+  src/mailleinlay.h
+  src/torus.h src/torus.cpp
+  src/ringglcanvas.h src/ringglcanvas.cpp
+  src/maillescreen.h src/maillescreen.cpp
+  src/tools/tool.h
+  src/tools/simpleaddtool.h src/tools/simpleaddtool.cpp
 )
 
 # Enable warnings for our source files
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-Wall -Wextra")
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-Weverything -Wno-padded")
+  set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-Wall")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-W4 -WX")
 endif()

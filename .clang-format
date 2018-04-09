@@ -1,5 +1,6 @@
 BasedOnStyle: LLVM
+
 AccessModifierOffset: -4
-BreakBeforeBraces: Linux
+BreakBeforeBraces: Allman
 BreakConstructorInitializersBeforeComma: true
 IndentWidth: 4
