@@ -20,7 +20,8 @@ public:
                                 int modifiers) override;
     virtual bool keyboardEvent(int key, int scancode, int action,
                                int modifiers) override;
-    virtual bool scrollEvent(const Eigen::Vector2i &p, const Eigen::Vector2f &rel) override;
+    virtual bool scrollEvent(const Eigen::Vector2i &p,
+                             const Eigen::Vector2f &rel) override;
 
     virtual void drawGL() override;
 

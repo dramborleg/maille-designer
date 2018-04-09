@@ -80,14 +80,17 @@ RingGLCanvas::RingGLCanvas(Widget *parent)
     MatrixXf positions, cur_positions;
     MatrixXf normals, cur_normals;
     MatrixXu indices, cur_indices;
-    for (size_t i = 0; i < rings.size(); i++) {
+    for (size_t i = 0; i < rings.size(); i++)
+    {
         // append indices
         size_t num_cols = indices.cols();
         cur_indices = rings[i].get_indices();
         indices.conservativeResize(3, indices.cols() + cur_indices.cols());
         indices.topRightCorner(3, cur_indices.cols()) = cur_indices;
-        for (size_t x = 0; x < indices.rows(); x++) {
-            for (size_t y = num_cols; y < indices.cols(); y++) {
+        for (size_t x = 0; x < indices.rows(); x++)
+        {
+            for (size_t y = num_cols; y < indices.cols(); y++)
+            {
                 indices(x, y) += positions.cols();
             }
         }
@@ -139,12 +142,16 @@ bool RingGLCanvas::keyboardEvent(int key, int scancode, int action,
     return false;
 }
 
-bool RingGLCanvas::scrollEvent(const Eigen::Vector2i &p, const Eigen::Vector2f &rel)
+bool RingGLCanvas::scrollEvent(const Eigen::Vector2i &p,
+                               const Eigen::Vector2f &rel)
 {
     std::cout << "p: " << p << "rel: " << rel << std::endl;
-    if (rel(1) > 0) {
+    if (rel(1) > 0)
+    {
         mvp(3, 3) -= 0.4;
-    } else if (rel(1) < 0) {
+    }
+    else if (rel(1) < 0)
+    {
         mvp(3, 3) += 0.4;
     }
     return false;
@@ -174,7 +181,8 @@ void RingGLCanvas::drawGL()
     glEnable(GL_DEPTH_TEST);
 
     uint32_t offset = 0;
-    for (size_t i = 0; i < rings.size(); i++) {
+    for (size_t i = 0; i < rings.size(); i++)
+    {
         // set ring color and shininess
         mShader.setUniform("ringColor", rings[i].get_color());
         mShader.setUniform("shininess", rings[i].get_shininess());
