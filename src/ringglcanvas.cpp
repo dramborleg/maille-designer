@@ -103,8 +103,12 @@ bool RingGLCanvas::mouseButtonEvent(const Eigen::Vector2i &p, int button,
     std::cout << "point: " << p << "button: " << button << "down: " << down
               << "modifiers" << modifiers << std::endl;
     std::cout << "absolute position: " << absolutePosition() << std::endl;
+
     if (tool)
-        return tool->mouseButtonEvent(p, button, down, modifiers, inlay);
+    {
+        Eigen::Vector2f pos = canvasToWorld(p);
+        return tool->mouseButtonEvent(p, button, down, modifiers, pos, inlay);
+    }
 
     return false;
 }
@@ -115,8 +119,12 @@ bool RingGLCanvas::mouseDragEvent(const Eigen::Vector2i &p,
 {
     std::cout << "point: " << p << "rel: " << rel << "button: " << button
               << "modifiers" << modifiers << std::endl;
+
     if (tool)
-        tool->mouseDragEvent(p, rel, button, modifiers, inlay);
+    {
+        Eigen::Vector2f pos = canvasToWorld(p);
+        return tool->mouseDragEvent(p, rel, button, modifiers, pos, inlay);
+    }
 
     return false;
 }
@@ -193,4 +201,15 @@ void RingGLCanvas::drawGL()
 void RingGLCanvas::setAmbientIntensityFactor(float iFactor)
 {
     inlay->ambientIntensity = iFactor;
+}
+
+Eigen::Vector2f RingGLCanvas::canvasToWorld(const Eigen::Vector2i &p)
+{
+    Eigen::Vector4f pos(0, 0, 0, 1);
+    pos(0) = 2 * (p(0) - absolutePosition()(0)) / (float)size()(0) - 1.0;
+    pos(1) = 1.0 - 2 * (p(1) - absolutePosition()(1)) / (float)size()(1);
+    pos = mvp.inverse() * pos;
+    pos = pos / pos(3);
+
+    return Eigen::Vector2f(pos(0), pos(1));
 }
