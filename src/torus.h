@@ -20,6 +20,7 @@ public:
     unsigned get_num_samples_cross_section() const { return nAlpha; }
     void set_rotation(nanogui::Matrix4f rotation) { this->rotation = rotation; }
     void set_center(float x, float y);
+    nanogui::Vector2f get_center() const;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

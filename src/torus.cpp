@@ -102,3 +102,9 @@ void Torus::set_center(float x, float y)
     translation(0, 3) = x;
     translation(1, 3) = y;
 }
+
+nanogui::Vector2f Torus::get_center() const
+{
+    nanogui::Vector2f center(translation(0, 3), translation(1, 3));
+    return center;
+}
