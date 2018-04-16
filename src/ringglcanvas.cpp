@@ -66,7 +66,7 @@ void RingGLCanvas::uploadRingData()
     {
         // append indices
         size_t num_cols = indices.cols();
-        cur_indices = inlay->rings[i].get_indices();
+        cur_indices = inlay->rings[i]->get_indices();
         indices.conservativeResize(3, indices.cols() + cur_indices.cols());
         indices.topRightCorner(3, cur_indices.cols()) = cur_indices;
         for (size_t x = 0; x < indices.rows(); x++)
@@ -78,13 +78,13 @@ void RingGLCanvas::uploadRingData()
         }
 
         // append positions
-        cur_positions = inlay->rings[i].get_positions();
+        cur_positions = inlay->rings[i]->get_positions();
         positions.conservativeResize(4,
                                      positions.cols() + cur_positions.cols());
         positions.topRightCorner(4, cur_positions.cols()) = cur_positions;
 
         // append normals
-        cur_normals = inlay->rings[i].get_normals();
+        cur_normals = inlay->rings[i]->get_normals();
         normals.conservativeResize(3, normals.cols() + cur_normals.cols());
         normals.topRightCorner(3, cur_normals.cols()) = cur_normals;
     }
@@ -186,11 +186,11 @@ void RingGLCanvas::drawGL()
     for (size_t i = 0; i < inlay->rings.size(); i++)
     {
         // set ring color and shininess
-        mShader.setUniform("ringColor", inlay->rings[i].get_color());
-        mShader.setUniform("shininess", inlay->rings[i].get_shininess());
+        mShader.setUniform("ringColor", inlay->rings[i]->get_color());
+        mShader.setUniform("shininess", inlay->rings[i]->get_shininess());
 
-        unsigned count = 2 * inlay->rings[i].get_num_samples_radius() *
-                         inlay->rings[i].get_num_samples_cross_section();
+        unsigned count = 2 * inlay->rings[i]->get_num_samples_radius() *
+                         inlay->rings[i]->get_num_samples_cross_section();
         mShader.drawIndexed(GL_TRIANGLES, offset, count);
         offset += count;
     }

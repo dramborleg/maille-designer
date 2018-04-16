@@ -8,8 +8,9 @@ bool SimpleAddTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
     if (!down)
         return true;
 
-    inlay->rings.push_back(Torus(Eigen::Vector3f(0.8, 0.0, 0.0)));
-    inlay->rings.back().set_center(worldPos(0), worldPos(1));
+    inlay->rings.push_back(
+        std::shared_ptr<Torus>(new Torus(Eigen::Vector3f(0.8, 0.0, 0.0))));
+    inlay->rings.back()->set_center(worldPos(0), worldPos(1));
     inlay->ringsModified = true;
 
     return true;
