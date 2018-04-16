@@ -5,7 +5,8 @@
 class Torus
 {
 public:
-    Torus() {}
+    Torus(nanogui::Vector3f color = nanogui::Vector3f(1.0, 0.0, 0.0),
+          float radius = 1.0, float thickness = 0.278);
     Torus(float radius, float thickness, unsigned numSamplesRadius = 128,
           unsigned numSamplesCrossSection = 32, float shininess = 1.0,
           nanogui::Vector3f color = nanogui::Vector3f(0.0, 0.0, 0.0));
@@ -23,6 +24,8 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
+    void init();
+
     float r;
     float shininess;
     float thickness;
