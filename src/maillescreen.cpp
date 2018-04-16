@@ -7,15 +7,18 @@
 
 #include "maillescreen.h"
 #include "ringglcanvas.h"
-#include "tools/simpleaddtool.h"
+#include "tools/weaveaddtool.h"
 
 MailleScreen::MailleScreen()
     : nanogui::Screen(Eigen::Vector2i(800, 600), "Maille Designer", false)
 {
     using namespace nanogui;
 
-    inlay = createSampleInlay();
-    std::shared_ptr<Tool> tool(new SimpleAddTool(ENTYPO_ICON_ADD_TO_LIST));
+    inlay = std::shared_ptr<MailleInlay>(new MailleInlay);
+    inlay->ambientIntensity = 0.5;
+    inlay->ringsModified = true;
+
+    std::shared_ptr<Tool> tool(new WeaveAddTool(ENTYPO_ICON_ADD_TO_LIST));
     mCanvas = new RingGLCanvas(this, inlay, tool);
     mCanvas->setPosition(Vector2i(200, 0));
     mCanvas->setBackgroundColor({100, 100, 100, 255});

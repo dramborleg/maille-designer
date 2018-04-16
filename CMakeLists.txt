@@ -56,6 +56,9 @@ set(SOURCE_FILES
   src/maillescreen.h src/maillescreen.cpp
   src/tools/tool.h
   src/tools/simpleaddtool.h src/tools/simpleaddtool.cpp
+  src/tools/weaveaddtool.h src/tools/weaveaddtool.cpp
+  src/weaves/weave.h
+  src/weaves/european4in1.h src/weaves/european4in1.cpp
 )
 
 # Enable warnings for our source files
