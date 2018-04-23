@@ -87,7 +87,7 @@ std::tuple<int, int, int> European4in1::nearestRing(const Eigen::Vector2f &loc)
     std::tuple<int, int, int> nearIdx(-1, 0, 0);
     float nearDist = std::numeric_limits<float>::max();
 
-    for (auto r : rings)
+    for (const auto &r : rings)
     {
         Eigen::Vector2f center = r.second->get_center();
         float dist = (loc - center).norm();
