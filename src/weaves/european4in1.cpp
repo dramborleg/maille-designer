@@ -34,32 +34,30 @@ void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
         newLayer = std::get<0>(nearIdx) ? 0 : 1;
         int curX = std::get<1>(nearIdx);
         int curY = std::get<2>(nearIdx);
+        float xDist = 1.85 * radius - 2 * thickness;
+        float yDist = radius - thickness;
 
         if (worldClickLoc(0) < nearCenter(0) &&
             worldClickLoc(1) < nearCenter(1))
         {
             idx = std::make_tuple(newLayer, curX - 1, curY - 1);
-            t->set_center(nearCenter(0) - (1.85 * radius - 2 * thickness),
-                          nearCenter(1) - (radius - thickness));
+            t->set_center(nearCenter(0) - xDist, nearCenter(1) - yDist);
         }
         else if (worldClickLoc(0) < nearCenter(0))
         {
             idx = std::make_tuple(newLayer, curX - 1, curY + 1);
-            t->set_center(nearCenter(0) - (1.85 * radius - 2 * thickness),
-                          nearCenter(1) + (radius - thickness));
+            t->set_center(nearCenter(0) - xDist, nearCenter(1) + yDist);
         }
         else if (worldClickLoc(0) > nearCenter(0) &&
                  worldClickLoc(1) < nearCenter(1))
         {
-            idx = std::make_tuple(newLayer, curX + 1, curY);
-            t->set_center(nearCenter(0) + (1.85 * radius - 2 * thickness),
-                          nearCenter(1) - (radius - thickness));
+            idx = std::make_tuple(newLayer, curX + 1, curY - 1);
+            t->set_center(nearCenter(0) + xDist, nearCenter(1) - yDist);
         }
         else
         {
             idx = std::make_tuple(newLayer, curX + 1, curY + 1);
-            t->set_center(nearCenter(0) + (1.85 * radius - 2 * thickness),
-                          nearCenter(1) + (radius - thickness));
+            t->set_center(nearCenter(0) + xDist, nearCenter(1) + yDist);
         }
     }
     else
