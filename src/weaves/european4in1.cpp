@@ -18,7 +18,7 @@ void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
         if (worldClickLoc(0) < nearCenter(0) &&
             worldClickLoc(1) < nearCenter(1))
         {
-            idx = std::make_tuple(newLayer, curX, curY);
+            idx = std::make_tuple(newLayer, curX - 1, curY - 1);
             t->set_center(nearCenter(0) - 1.5 * radius,
                           nearCenter(1) - 1.5 * radius);
         }
