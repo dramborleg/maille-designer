@@ -21,6 +21,7 @@ public:
     void set_rotation(nanogui::Matrix4f rotation) { this->rotation = rotation; }
     void set_center(float x, float y);
     nanogui::Vector2f get_center() const;
+    bool hasSameCenter(const Torus &t) const;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

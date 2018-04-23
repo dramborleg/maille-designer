@@ -108,3 +108,15 @@ nanogui::Vector2f Torus::get_center() const
     nanogui::Vector2f center(translation(0, 3), translation(1, 3));
     return center;
 }
+
+bool Torus::hasSameCenter(const Torus &t) const
+{
+    Eigen::Vector2f center = get_center();
+    Eigen::Vector2f otherCenter = t.get_center();
+    float dist = (otherCenter - center).norm();
+
+    if (dist < thickness / 10.0)
+        return true;
+
+    return false;
+}

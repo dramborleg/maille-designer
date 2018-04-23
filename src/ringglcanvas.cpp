@@ -21,6 +21,7 @@ RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
         "uniform vec3 specularIntensity;\n"
         "uniform vec3 ringColor;\n"
         "uniform float shininess;\n"
+        "uniform bool selected;\n"
         "in vec4 position;\n"
         "in vec3 normal;\n"
         "out vec4 frag_color;\n"
@@ -35,7 +36,10 @@ RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
         "    dLight = diffusePrefix * dLight;\n"
         "    vec3 sLight = ringColor * specularIntensity;\n"
         "    sLight = specularPrefix * sLight;\n"
-        "    frag_color = vec4(aLight + dLight + sLight, 1.0);\n"
+        "    if (selected)\n"
+        "        frag_color = vec4(aLight, 1.0);\n"
+        "    else\n"
+        "        frag_color = vec4(aLight + dLight + sLight, 1.0);\n"
         "    gl_Position = modelViewProj * position;\n"
         "}",
 
@@ -188,6 +192,7 @@ void RingGLCanvas::drawGL()
         // set ring color and shininess
         mShader.setUniform("ringColor", inlay->rings[i]->get_color());
         mShader.setUniform("shininess", inlay->rings[i]->get_shininess());
+        mShader.setUniform("selected", ringIsSelected(*inlay->rings[i]));
 
         unsigned count = 2 * inlay->rings[i]->get_num_samples_radius() *
                          inlay->rings[i]->get_num_samples_cross_section();
@@ -212,4 +217,15 @@ Eigen::Vector2f RingGLCanvas::canvasToWorld(const Eigen::Vector2i &p)
     pos = pos / pos(3);
 
     return Eigen::Vector2f(pos(0), pos(1));
+}
+
+bool RingGLCanvas::ringIsSelected(const Torus &t)
+{
+    for (const auto &ring : inlay->selectedRings)
+    {
+        if (ring->hasSameCenter(t))
+            return true;
+    }
+
+    return false;
 }

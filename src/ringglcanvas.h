@@ -32,6 +32,7 @@ public:
 private:
     void uploadRingData();
     Eigen::Vector2f canvasToWorld(const Eigen::Vector2i &p);
+    bool ringIsSelected(const Torus &t);
 
     nanogui::GLShader mShader;
     // model view projection matrix
