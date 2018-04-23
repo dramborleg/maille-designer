@@ -22,4 +22,5 @@ private:
     std::shared_ptr<MailleInlay> inlay;
     // Tools
     std::shared_ptr<Tool> adderTool;
+    std::shared_ptr<Tool> selectionTool;
 };

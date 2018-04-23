@@ -7,6 +7,7 @@
 
 #include "maillescreen.h"
 #include "ringglcanvas.h"
+#include "tools/selectiontool.h"
 #include "tools/weaveaddtool.h"
 
 MailleScreen::MailleScreen()
@@ -18,8 +19,11 @@ MailleScreen::MailleScreen()
     inlay->ambientIntensity = 0.5;
     inlay->ringsModified = true;
 
+    // Initialize tools
+    adderTool = std::make_shared<WeaveAddTool>(ENTYPO_ICON_PLUS);
+    selectionTool = std::make_shared<SelectionTool>(ENTYPO_ICON_MOUSE_POINTER);
+
     // Ring Canvas
-    adderTool = std::make_shared<WeaveAddTool>(ENTYPO_ICON_ADD_TO_LIST);
     mCanvas = new RingGLCanvas(this, inlay, adderTool);
     mCanvas->setPosition(Vector2i(200, 0));
     mCanvas->setBackgroundColor({100, 100, 100, 255});
@@ -34,12 +38,17 @@ MailleScreen::MailleScreen()
     Widget *toolsWidget = new Widget(palette);
     toolsWidget->setLayout(
         new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 0));
-    // Ring adder button
+    // Ring adder tool button
     Button *b = new Button(toolsWidget, "", adderTool->getIcon());
     b->setFlags(Button::RadioButton);
     b->setTooltip("Add Rings");
     b->setPushed(true);
     b->setCallback([this]() { mCanvas->setTool(adderTool); });
+    // Ring selection tool button
+    b = new Button(toolsWidget, "", selectionTool->getIcon());
+    b->setFlags(Button::RadioButton);
+    b->setTooltip("Select Rings");
+    b->setCallback([this]() { mCanvas->setTool(selectionTool); });
     // Brightness slider widget
     new Label(palette, "Brightness Slider", "sans-bold");
     Slider *brightness = new Slider(palette);
