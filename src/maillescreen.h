@@ -5,6 +5,7 @@
 #include "mailleinlay.h"
 
 class RingGLCanvas;
+class Tool;
 
 class MailleScreen : public nanogui::Screen
 {
@@ -17,5 +18,8 @@ private:
     std::shared_ptr<MailleInlay> createSampleInlay();
 
     RingGLCanvas *mCanvas;
+    // Global inlay state
     std::shared_ptr<MailleInlay> inlay;
+    // Tools
+    std::shared_ptr<Tool> adderTool;
 };

@@ -18,17 +18,31 @@ MailleScreen::MailleScreen()
     inlay->ambientIntensity = 0.5;
     inlay->ringsModified = true;
 
-    std::shared_ptr<Tool> tool(new WeaveAddTool(ENTYPO_ICON_ADD_TO_LIST));
-    mCanvas = new RingGLCanvas(this, inlay, tool);
+    // Ring Canvas
+    adderTool = std::make_shared<WeaveAddTool>(ENTYPO_ICON_ADD_TO_LIST);
+    mCanvas = new RingGLCanvas(this, inlay, adderTool);
     mCanvas->setPosition(Vector2i(200, 0));
     mCanvas->setBackgroundColor({100, 100, 100, 255});
     mCanvas->setSize({600, 600});
 
-    Window *controls = new Window(this, "Controls");
-    controls->setPosition(Vector2i(16, 16));
-    controls->setLayout(new GroupLayout());
-    new Label(controls, "Brightness Slider", "sans-bold");
-    Slider *brightness = new Slider(controls);
+    // Tool Palette and Widget Window
+    Window *palette = new Window(this, "Tools");
+    palette->setPosition(Vector2i(0, 0));
+    palette->setLayout(new GroupLayout());
+    // Palette label and widget for containing buttons
+    new Label(palette, "Tools", "sans-bold");
+    Widget *toolsWidget = new Widget(palette);
+    toolsWidget->setLayout(
+        new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 0));
+    // Ring adder button
+    Button *b = new Button(toolsWidget, "", adderTool->getIcon());
+    b->setFlags(Button::RadioButton);
+    b->setTooltip("Add Rings");
+    b->setPushed(true);
+    b->setCallback([this]() { mCanvas->setTool(adderTool); });
+    // Brightness slider widget
+    new Label(palette, "Brightness Slider", "sans-bold");
+    Slider *brightness = new Slider(palette);
     brightness->setTooltip("Set ambient brightness multiplier");
     brightness->setValue(mCanvas->getAmbientIntensityFactor());
     brightness->setCallback(
