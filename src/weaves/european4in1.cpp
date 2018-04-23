@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "european4in1.h"
 
 void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
