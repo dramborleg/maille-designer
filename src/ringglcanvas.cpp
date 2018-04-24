@@ -104,9 +104,6 @@ bool RingGLCanvas::mouseButtonEvent(const Eigen::Vector2i &p, int button,
                                     bool down, int modifiers)
 {
     requestFocus();
-    std::cout << "point: " << p << "button: " << button << "down: " << down
-              << "modifiers" << modifiers << std::endl;
-    std::cout << "absolute position: " << absolutePosition() << std::endl;
 
     if (tool)
     {
@@ -121,9 +118,6 @@ bool RingGLCanvas::mouseDragEvent(const Eigen::Vector2i &p,
                                   const Eigen::Vector2i &rel, int button,
                                   int modifiers)
 {
-    std::cout << "point: " << p << "rel: " << rel << "button: " << button
-              << "modifiers" << modifiers << std::endl;
-
     if (tool)
     {
         Eigen::Vector2f pos = canvasToWorld(p);
@@ -145,15 +139,7 @@ bool RingGLCanvas::keyboardEvent(int key, int scancode, int action,
 bool RingGLCanvas::scrollEvent(const Eigen::Vector2i &p,
                                const Eigen::Vector2f &rel)
 {
-    std::cout << "p: " << p << "rel: " << rel << std::endl;
-    if (rel(1) > 0)
-    {
-        mvp(3, 3) -= 0.4;
-    }
-    else if (rel(1) < 0)
-    {
-        mvp(3, 3) += 0.4;
-    }
+    mvp(3, 3) += (rel(1) > 0) ? -0.4 : 0.4;
     return false;
 }
 
