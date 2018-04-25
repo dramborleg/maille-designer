@@ -1,11 +1,8 @@
 #include "ringglcanvas.h"
 #include "tools/tool.h"
 
-RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
-                           std::shared_ptr<Tool> tool)
+RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<Tool> tool)
     : nanogui::GLCanvas(parent)
-    , inlay(inlay)
-    , tool(tool)
 {
     mShader.init(
         /* An identifying name */
@@ -59,6 +56,9 @@ RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
 
     mvp.setIdentity();
     mvp(3, 3) = 8.0;
+
+    inlay.ambientIntensity = 0.5;
+    setTool(tool);
 }
 
 void RingGLCanvas::uploadRingData()
@@ -66,11 +66,11 @@ void RingGLCanvas::uploadRingData()
     nanogui::MatrixXf positions, cur_positions;
     nanogui::MatrixXf normals, cur_normals;
     nanogui::MatrixXu indices, cur_indices;
-    for (size_t i = 0; i < inlay->rings.size(); i++)
+    for (size_t i = 0; i < inlay.rings.size(); i++)
     {
         // append indices
         size_t num_cols = indices.cols();
-        cur_indices = inlay->rings[i]->get_indices();
+        cur_indices = inlay.rings[i]->get_indices();
         indices.conservativeResize(3, indices.cols() + cur_indices.cols());
         indices.topRightCorner(3, cur_indices.cols()) = cur_indices;
         for (size_t x = 0; x < indices.rows(); x++)
@@ -82,13 +82,13 @@ void RingGLCanvas::uploadRingData()
         }
 
         // append positions
-        cur_positions = inlay->rings[i]->get_positions();
+        cur_positions = inlay.rings[i]->get_positions();
         positions.conservativeResize(4,
                                      positions.cols() + cur_positions.cols());
         positions.topRightCorner(4, cur_positions.cols()) = cur_positions;
 
         // append normals
-        cur_normals = inlay->rings[i]->get_normals();
+        cur_normals = inlay.rings[i]->get_normals();
         normals.conservativeResize(3, normals.cols() + cur_normals.cols());
         normals.topRightCorner(3, cur_normals.cols()) = cur_normals;
     }
@@ -147,10 +147,10 @@ void RingGLCanvas::drawGL()
 {
     using namespace nanogui;
 
-    if (inlay->ringsModified)
+    if (inlay.ringsModified)
     {
         uploadRingData();
-        inlay->ringsModified = false;
+        inlay.ringsModified = false;
     }
 
     mShader.bind();
@@ -160,7 +160,7 @@ void RingGLCanvas::drawGL()
     // set up view direction and light color (white light, not fully on)
     Eigen::Vector3f viewDirection(0, 0, 1);
     viewDirection.normalize();
-    float ai = aIntensity * inlay->ambientIntensity;
+    float ai = aIntensity * inlay.ambientIntensity;
     Eigen::Vector3f ambientIntensity(ai, ai, ai);
     Eigen::Vector3f diffuseIntensity(dIntensity, dIntensity, dIntensity);
     Eigen::Vector3f specularIntensity(sIntensity, sIntensity, sIntensity);
@@ -173,15 +173,15 @@ void RingGLCanvas::drawGL()
     glEnable(GL_DEPTH_TEST);
 
     uint32_t offset = 0;
-    for (size_t i = 0; i < inlay->rings.size(); i++)
+    for (size_t i = 0; i < inlay.rings.size(); i++)
     {
         // set ring color and shininess
-        mShader.setUniform("ringColor", inlay->rings[i]->get_color());
-        mShader.setUniform("shininess", inlay->rings[i]->get_shininess());
-        mShader.setUniform("selected", ringIsSelected(*inlay->rings[i]));
+        mShader.setUniform("ringColor", inlay.rings[i]->get_color());
+        mShader.setUniform("shininess", inlay.rings[i]->get_shininess());
+        mShader.setUniform("selected", ringIsSelected(*inlay.rings[i]));
 
-        unsigned count = 2 * inlay->rings[i]->get_num_samples_radius() *
-                         inlay->rings[i]->get_num_samples_cross_section();
+        unsigned count = 2 * inlay.rings[i]->get_num_samples_radius() *
+                         inlay.rings[i]->get_num_samples_cross_section();
         mShader.drawIndexed(GL_TRIANGLES, offset, count);
         offset += count;
     }
@@ -191,7 +191,12 @@ void RingGLCanvas::drawGL()
 
 void RingGLCanvas::setAmbientIntensityFactor(float iFactor)
 {
-    inlay->ambientIntensity = iFactor;
+    inlay.ambientIntensity = iFactor;
+}
+
+void RingGLCanvas::setTool(std::shared_ptr<Tool> t)
+{
+    tool = t;
 }
 
 Eigen::Vector2f RingGLCanvas::canvasToWorld(const Eigen::Vector2i &p)
@@ -207,7 +212,7 @@ Eigen::Vector2f RingGLCanvas::canvasToWorld(const Eigen::Vector2i &p)
 
 bool RingGLCanvas::ringIsSelected(const Torus &t)
 {
-    for (const auto &ring : inlay->selectedRings)
+    for (const auto &ring : inlay.selectedRings)
     {
         if (ring->hasSameCenter(t))
             return true;

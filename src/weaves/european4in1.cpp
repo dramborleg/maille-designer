@@ -20,7 +20,7 @@ European4in1::European4in1(float radius, float thickness)
 }
 
 void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
-                           std::shared_ptr<MailleInlay> inlay)
+                           MailleInlay &inlay)
 {
     std::tuple<int, int, int> idx;
     auto t = std::shared_ptr<Torus>(new Torus());
@@ -72,8 +72,8 @@ void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
     if (idxIt == rings.end())
     {
         rings[idx] = t;
-        inlay->rings.push_back(t);
-        inlay->ringsModified = true;
+        inlay.rings.push_back(t);
+        inlay.ringsModified = true;
     }
 
     return;
