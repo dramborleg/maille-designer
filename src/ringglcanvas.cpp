@@ -196,7 +196,11 @@ void RingGLCanvas::setAmbientIntensityFactor(float iFactor)
 
 void RingGLCanvas::setTool(std::shared_ptr<Tool> t)
 {
+    if (tool)
+        tool->unload(inlay);
+
     tool = t;
+    tool->load(inlay);
 }
 
 Eigen::Vector2f RingGLCanvas::canvasToWorld(const Eigen::Vector2i &p)

@@ -1,5 +1,7 @@
 #include "selectiontool.h"
 
+void SelectionTool::unload(MailleInlay &inlay) { inlay.selectedRings.clear(); }
+
 bool SelectionTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
                                      bool down, int modifiers,
                                      const Eigen::Vector2f &worldPos,

@@ -10,6 +10,8 @@ public:
     {
     }
 
+    virtual void load(MailleInlay &inlay) {}
+    virtual void unload(MailleInlay &inlay) {}
     virtual bool mouseButtonEvent(const Eigen::Vector2i &p, int button,
                                   bool down, int modifiers,
                                   const Eigen::Vector2f &worldPos,
