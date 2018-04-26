@@ -12,12 +12,13 @@ public:
     void addRing(const Eigen::Vector2f &worldClickLoc, MailleInlay &inlay);
 
 private:
-    std::tuple<int, int, int> nearestRing(const Eigen::Vector2f &loc);
+    std::pair<int, int> nearestRing(const Eigen::Vector2f &loc);
     Eigen::Matrix4f rot0, rot1;
     float radius;
     float theta;
     float thickness;
 
-    // Rings are indexed by a 3-tuple (layer, x, y). Valid layers are 0 and 1.
-    std::map<std::tuple<int, int, int>, std::shared_ptr<Torus>> rings;
+    // Rings are indexed by their (x, y) coordinate in the weave. The rotation
+    // of a ring can be determined based on its x coordinate (even/odd).
+    std::map<std::pair<int, int>, std::shared_ptr<Torus>> rings;
 };

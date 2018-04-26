@@ -1,4 +1,5 @@
 #include <cmath>
+#include <stdexcept>
 
 #include "european4in1.h"
 
@@ -22,51 +23,55 @@ European4in1::European4in1(float radius, float thickness)
 void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
                            MailleInlay &inlay)
 {
-    std::tuple<int, int, int> idx;
+    std::pair<int, int> idx;
     auto t = std::shared_ptr<Torus>(new Torus());
-    std::tuple<int, int, int> nearIdx = nearestRing(worldClickLoc);
-    int newLayer = 0;
+    std::pair<int, int> nearIdx;
+    int curX = 0;
+    int curY = 0;
 
-    auto near = rings.find(nearIdx);
-    if (near != rings.end())
+    try
     {
+        nearIdx = nearestRing(worldClickLoc);
+        auto near = rings.find(nearIdx);
+        if (near == rings.end())
+            throw std::domain_error("Ring with given index not found\n");
+
         Eigen::Vector2f nearCenter = near->second->get_center();
-        newLayer = std::get<0>(nearIdx) ? 0 : 1;
-        int curX = std::get<1>(nearIdx);
-        int curY = std::get<2>(nearIdx);
         float xDist = 1.85 * radius - 2 * thickness;
         float yDist = radius - thickness;
+        curX = nearIdx.first;
+        curY = nearIdx.second;
 
         if (worldClickLoc(0) < nearCenter(0) &&
             worldClickLoc(1) < nearCenter(1))
         {
-            idx = std::make_tuple(newLayer, curX - 1, curY - 1);
+            idx = std::make_pair(--curX, --curY);
             t->set_center(nearCenter(0) - xDist, nearCenter(1) - yDist);
         }
         else if (worldClickLoc(0) < nearCenter(0))
         {
-            idx = std::make_tuple(newLayer, curX - 1, curY + 1);
+            idx = std::make_pair(--curX, ++curY);
             t->set_center(nearCenter(0) - xDist, nearCenter(1) + yDist);
         }
         else if (worldClickLoc(0) > nearCenter(0) &&
                  worldClickLoc(1) < nearCenter(1))
         {
-            idx = std::make_tuple(newLayer, curX + 1, curY - 1);
+            idx = std::make_pair(++curX, --curY);
             t->set_center(nearCenter(0) + xDist, nearCenter(1) - yDist);
         }
         else
         {
-            idx = std::make_tuple(newLayer, curX + 1, curY + 1);
+            idx = std::make_pair(++curX, ++curY);
             t->set_center(nearCenter(0) + xDist, nearCenter(1) + yDist);
         }
     }
-    else
+    catch (std::domain_error &e)
     {
-        idx = std::make_tuple(newLayer, 0, 0);
+        idx = std::make_pair(curX, curY);
         t->set_center(0.0, 0.0);
     }
 
-    t->set_rotation(newLayer ? rot1 : rot0);
+    t->set_rotation(curX % 2 ? rot1 : rot0);
 
     auto idxIt = rings.find(idx);
     if (idxIt == rings.end())
@@ -79,10 +84,12 @@ void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
     return;
 }
 
-std::tuple<int, int, int> European4in1::nearestRing(const Eigen::Vector2f &loc)
+std::pair<int, int> European4in1::nearestRing(const Eigen::Vector2f &loc)
 {
-    // If near ring doesn't exist, return an invalid layer
-    std::tuple<int, int, int> nearIdx(-1, 0, 0);
+    if (rings.empty())
+        throw std::domain_error("Nearest ring undefined\n");
+
+    std::pair<int, int> nearIdx;
     float nearDist = std::numeric_limits<float>::max();
 
     for (const auto &r : rings)
