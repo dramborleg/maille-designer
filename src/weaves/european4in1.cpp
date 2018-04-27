@@ -80,8 +80,43 @@ void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
         inlay.rings.push_back(t);
         inlay.ringsModified = true;
     }
+}
 
-    return;
+void European4in1::deleteRing(const Eigen::Vector2f &worldClickLoc,
+                              MailleInlay &inlay)
+{
+    try
+    {
+        std::pair<int, int> nearIdx = nearestRing(worldClickLoc);
+        auto near = rings.find(nearIdx);
+        if (near == rings.end())
+            throw std::domain_error("Ring with given index not found\n");
+
+        for (auto r = inlay.rings.begin(); r != inlay.rings.end(); r++)
+        {
+            if ((*r)->hasSameCenter(*near->second))
+            {
+                inlay.rings.erase(r);
+                inlay.ringsModified = true;
+                break;
+            }
+        }
+
+        for (auto r = inlay.selectedRings.begin();
+             r != inlay.selectedRings.end(); r++)
+        {
+            if ((*r)->hasSameCenter(*near->second))
+            {
+                inlay.selectedRings.erase(r);
+                break;
+            }
+        }
+
+        rings.erase(near);
+    }
+    catch (std::domain_error &e)
+    {
+    }
 }
 
 std::pair<int, int> European4in1::nearestRing(const Eigen::Vector2f &loc)

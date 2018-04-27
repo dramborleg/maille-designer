@@ -10,6 +10,7 @@ public:
     European4in1(float radius = 1.0, float thickness = 0.278);
 
     void addRing(const Eigen::Vector2f &worldClickLoc, MailleInlay &inlay);
+    void deleteRing(const Eigen::Vector2f &worldClickLoc, MailleInlay &inlay);
 
 private:
     std::pair<int, int> nearestRing(const Eigen::Vector2f &loc);

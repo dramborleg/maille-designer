@@ -26,6 +26,11 @@ public:
     {
         return false;
     }
+    virtual bool keyboardEvent(int key, int scancode, int action, int modifiers,
+                               MailleInlay &inlay)
+    {
+        return false;
+    }
     int getIcon() { return icon; }
 
 private:

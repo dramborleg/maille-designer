@@ -11,4 +11,6 @@ public:
 
     virtual void addRing(const Eigen::Vector2f &worldClickLoc,
                          MailleInlay &inlay) = 0;
+    virtual void deleteRing(const Eigen::Vector2f &worldClickLoc,
+                            MailleInlay &inlay) = 0;
 };

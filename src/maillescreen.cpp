@@ -9,6 +9,7 @@
 #include "ringglcanvas.h"
 #include "tools/selectiontool.h"
 #include "tools/weaveaddtool.h"
+#include "weaves/european4in1.h"
 
 MailleScreen::MailleScreen()
     : nanogui::Screen(Eigen::Vector2i(800, 600), "Maille Designer", false)
@@ -16,8 +17,10 @@ MailleScreen::MailleScreen()
     using namespace nanogui;
 
     // Initialize tools
-    adderTool = std::make_shared<WeaveAddTool>(ENTYPO_ICON_PLUS);
-    selectionTool = std::make_shared<SelectionTool>(ENTYPO_ICON_MOUSE_POINTER);
+    auto weaveManager = std::make_shared<European4in1>();
+    adderTool = std::make_shared<WeaveAddTool>(ENTYPO_ICON_PLUS, weaveManager);
+    selectionTool = std::make_shared<SelectionTool>(ENTYPO_ICON_MOUSE_POINTER,
+                                                    weaveManager);
 
     // Ring Canvas
     mCanvas = new RingGLCanvas(this, adderTool);
