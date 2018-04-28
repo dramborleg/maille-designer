@@ -1,3 +1,5 @@
+#include <GLFW/glfw3.h>
+
 #include "selectiontool.h"
 
 SelectionTool::SelectionTool(int icon, std::shared_ptr<Weave> weaveManager)
@@ -67,26 +69,20 @@ bool SelectionTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
 bool SelectionTool::keyboardEvent(int key, int scancode, int action,
                                   int modifiers, MailleInlay &inlay)
 {
-    bool ret = false;
+    bool ret = true;
 
-    if (key == 261 && scancode == 119)
+    if (key == GLFW_KEY_DELETE && action)
     {
-        if (!action)
-            return true;
-
         deleteSelection(inlay);
-        ret = true;
     }
-    else if ((key == 345 && scancode == 105) || (key == 341 && scancode == 37))
+    else if (key == GLFW_KEY_LEFT_CONTROL || key == GLFW_KEY_RIGHT_CONTROL)
     {
         if (action)
             ctrlDown = true;
         else
             ctrlDown = false;
-
-        ret = true;
     }
-    else if (key == 65 && scancode == 38)
+    else if (key == GLFW_KEY_A)
     {
         if (action && ctrlDown)
         {
@@ -95,8 +91,10 @@ bool SelectionTool::keyboardEvent(int key, int scancode, int action,
             for (const auto &ring : inlay.rings)
                 inlay.selectedRings.push_back(ring);
         }
-
-        ret = true;
+    }
+    else
+    {
+        ret = false;
     }
 
     return ret;

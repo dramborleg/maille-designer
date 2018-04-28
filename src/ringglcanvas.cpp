@@ -146,10 +146,6 @@ bool RingGLCanvas::keyboardEvent(int key, int scancode, int action,
             return true;
     }
 
-    std::cout << "key: " << key << "scancode: " << scancode
-              << "action: " << action << "modifiers: " << modifiers
-              << std::endl;
-
     return false;
 }
 
