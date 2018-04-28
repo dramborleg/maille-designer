@@ -19,4 +19,6 @@ private:
     // Tools
     std::shared_ptr<Tool> adderTool;
     std::shared_ptr<Tool> selectionTool;
+    // Global foreground color
+    std::shared_ptr<Eigen::Vector3f> fgcolor;
 };

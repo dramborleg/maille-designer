@@ -16,9 +16,13 @@ MailleScreen::MailleScreen()
 {
     using namespace nanogui;
 
+    // Initialize foreground color
+    fgcolor = std::make_shared<Eigen::Vector3f>(1.0, 0.0, 0.0);
+
     // Initialize tools
     auto weaveManager = std::make_shared<European4in1>();
-    adderTool = std::make_shared<WeaveAddTool>(ENTYPO_ICON_PLUS, weaveManager);
+    adderTool =
+        std::make_shared<WeaveAddTool>(ENTYPO_ICON_PLUS, weaveManager, fgcolor);
     selectionTool = std::make_shared<SelectionTool>(ENTYPO_ICON_MOUSE_POINTER,
                                                     weaveManager);
 
@@ -55,6 +59,9 @@ MailleScreen::MailleScreen()
     brightness->setValue(mCanvas->getAmbientIntensityFactor());
     brightness->setCallback(
         [this](float val) { mCanvas->setAmbientIntensityFactor(val); });
+    // Global foreground color selector
+    ColorWheel *wheel = new ColorWheel(palette);
+    wheel->setCallback([this](const Color &col) { *fgcolor = col.head(3); });
 
     performLayout();
 }

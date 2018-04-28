@@ -21,11 +21,11 @@ European4in1::European4in1(float radius, float thickness)
 }
 
 void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
-                           MailleInlay &inlay)
+                           const Eigen::Vector3f &color, MailleInlay &inlay)
 {
     std::pair<int, int> idx;
-    auto t = std::shared_ptr<Torus>(new Torus());
     std::pair<int, int> nearIdx;
+    auto t = std::make_shared<Torus>(color);
     int curX = 0;
     int curY = 0;
 
