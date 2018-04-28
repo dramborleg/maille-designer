@@ -15,6 +15,7 @@ public:
     nanogui::MatrixXf get_normals() const;
     const nanogui::MatrixXu &get_indices() const { return indices; }
     const nanogui::Vector3f &get_color() const { return color; }
+    float get_radius() const { return r; }
     float get_shininess() const { return shininess; }
     unsigned get_num_samples_radius() const { return nTheta; }
     unsigned get_num_samples_cross_section() const { return nAlpha; }

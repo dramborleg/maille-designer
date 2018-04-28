@@ -33,6 +33,12 @@ bool SelectionTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
         }
     }
 
+    if (nearDist > 2 * nearest->get_radius())
+    {
+        inlay.selectedRings.clear();
+        return true;
+    }
+
     if (!ctrlDown)
     {
         inlay.selectedRings.clear();
