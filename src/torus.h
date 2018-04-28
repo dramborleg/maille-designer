@@ -20,6 +20,7 @@ public:
     unsigned get_num_samples_cross_section() const { return nAlpha; }
     void set_rotation(nanogui::Matrix4f rotation);
     void set_center(float x, float y);
+    void set_color(const nanogui::Vector3f &color) { this->color = color; }
     nanogui::Vector2f get_center() const;
     bool hasSameCenter(const Torus &t) const;
 

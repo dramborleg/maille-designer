@@ -68,9 +68,7 @@ bool SelectionTool::keyboardEvent(int key, int scancode, int action,
         if (!action)
             return true;
 
-        while (!inlay.selectedRings.empty())
-            weaveManager->deleteRing(inlay.selectedRings[0]->get_center(),
-                                     inlay);
+        deleteSelection(inlay);
         ret = true;
     }
     else if ((key == 345 && scancode == 105) || (key == 341 && scancode == 37))
@@ -96,4 +94,17 @@ bool SelectionTool::keyboardEvent(int key, int scancode, int action,
     }
 
     return ret;
+}
+
+void SelectionTool::deleteSelection(MailleInlay &inlay)
+{
+    while (!inlay.selectedRings.empty())
+        weaveManager->deleteRing(inlay.selectedRings[0]->get_center(), inlay);
+}
+
+void SelectionTool::setSelectionColor(MailleInlay &inlay,
+                                      const Eigen::Vector3f &color)
+{
+    for (auto &r : inlay.selectedRings)
+        r->set_color(color);
 }

@@ -14,6 +14,8 @@ public:
                           MailleInlay &inlay);
     bool keyboardEvent(int key, int scancode, int action, int modifiers,
                        MailleInlay &inlay);
+    void deleteSelection(MailleInlay &inlay);
+    void setSelectionColor(MailleInlay &inlay, const Eigen::Vector3f &color);
 
 private:
     std::shared_ptr<Weave> weaveManager;

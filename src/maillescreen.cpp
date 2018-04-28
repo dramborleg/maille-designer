@@ -16,6 +16,10 @@ MailleScreen::MailleScreen()
 {
     using namespace nanogui;
 
+    // Initialize inlay
+    inlay = std::make_shared<MailleInlay>();
+    inlay->ambientIntensity = 0.5;
+
     // Initialize foreground color
     fgcolor = std::make_shared<Eigen::Vector3f>(1.0, 0.0, 0.0);
 
@@ -27,7 +31,7 @@ MailleScreen::MailleScreen()
                                                     weaveManager);
 
     // Ring Canvas
-    mCanvas = new RingGLCanvas(this, adderTool);
+    mCanvas = new RingGLCanvas(this, inlay, adderTool);
     mCanvas->setPosition(Vector2i(200, 0));
     mCanvas->setBackgroundColor({100, 100, 100, 255});
     mCanvas->setSize({600, 600});
@@ -62,6 +66,24 @@ MailleScreen::MailleScreen()
     // Global foreground color selector
     ColorWheel *wheel = new ColorWheel(palette);
     wheel->setCallback([this](const Color &col) { *fgcolor = col.head(3); });
+
+    // Tool specific buttons
+    new Label(palette, "Tool operations", "sans-bold");
+    Widget *toolOperations = new Widget(palette);
+    toolOperations->setLayout(
+        new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 0));
+    // Selection tool delete button
+    Button *selectionToolDelete =
+        new Button(toolOperations, "", ENTYPO_ICON_TRASH);
+    selectionToolDelete->setTooltip("Delete Selection");
+    selectionToolDelete->setCallback(
+        [this]() { selectionTool->deleteSelection(*inlay); });
+    // Selection tool set color button
+    Button *selectionToolColor =
+        new Button(toolOperations, "", ENTYPO_ICON_PALETTE);
+    selectionToolColor->setTooltip("Set Selection Color");
+    selectionToolColor->setCallback(
+        [this]() { selectionTool->setSelectionColor(*inlay, *fgcolor); });
 
     performLayout();
 }
