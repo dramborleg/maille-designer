@@ -17,4 +17,5 @@ public:
 
 private:
     std::shared_ptr<Weave> weaveManager;
+    bool ctrlDown;
 };

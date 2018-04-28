@@ -16,8 +16,10 @@ bool SelectionTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
     if (!down || inlay.rings.empty())
         return true;
 
-    std::shared_ptr<Torus> nearest;
+    bool isSelected = false;
     float nearDist = std::numeric_limits<float>::max();
+    std::shared_ptr<Torus> nearest;
+    std::vector<std::shared_ptr<Torus>>::iterator rSelected;
 
     for (const auto &r : inlay.rings)
     {
@@ -31,14 +33,36 @@ bool SelectionTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
         }
     }
 
-    inlay.selectedRings.clear();
-    inlay.selectedRings.push_back(nearest);
+    if (!ctrlDown)
+    {
+        inlay.selectedRings.clear();
+        inlay.selectedRings.push_back(nearest);
+        return true;
+    }
+
+    for (auto r = inlay.selectedRings.begin(); r != inlay.selectedRings.end();
+         r++)
+    {
+        if ((*r)->hasSameCenter(*nearest))
+        {
+            isSelected = true;
+            rSelected = r;
+            break;
+        }
+    }
+    if (isSelected)
+        inlay.selectedRings.erase(rSelected);
+    else
+        inlay.selectedRings.push_back(nearest);
+
     return true;
 }
 
 bool SelectionTool::keyboardEvent(int key, int scancode, int action,
                                   int modifiers, MailleInlay &inlay)
 {
+    bool ret = false;
+
     if (key == 261 && scancode == 119)
     {
         if (!action)
@@ -47,8 +71,29 @@ bool SelectionTool::keyboardEvent(int key, int scancode, int action,
         while (!inlay.selectedRings.empty())
             weaveManager->deleteRing(inlay.selectedRings[0]->get_center(),
                                      inlay);
-        return true;
+        ret = true;
+    }
+    else if ((key == 345 && scancode == 105) || (key == 341 && scancode == 37))
+    {
+        if (action)
+            ctrlDown = true;
+        else
+            ctrlDown = false;
+
+        ret = true;
+    }
+    else if (key == 65 && scancode == 38)
+    {
+        if (action && ctrlDown)
+        {
+            inlay.selectedRings.clear();
+
+            for (const auto &ring : inlay.rings)
+                inlay.selectedRings.push_back(ring);
+        }
+
+        ret = true;
     }
 
-    return false;
+    return ret;
 }
