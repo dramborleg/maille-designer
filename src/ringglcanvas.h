@@ -19,6 +19,9 @@ public:
     float getAmbientIntensityFactor() const { return inlay->ambientIntensity; }
     virtual bool mouseButtonEvent(const Eigen::Vector2i &p, int button,
                                   bool down, int modifiers) override;
+    virtual bool mouseMotionEvent(const Eigen::Vector2i &p,
+                                  const Eigen::Vector2i &rel, int button,
+                                  int modifiers) override;
     virtual bool mouseDragEvent(const Eigen::Vector2i &p,
                                 const Eigen::Vector2i &rel, int button,
                                 int modifiers) override;

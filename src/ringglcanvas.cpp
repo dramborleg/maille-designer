@@ -112,7 +112,16 @@ bool RingGLCanvas::mouseButtonEvent(const Eigen::Vector2i &p, int button,
         return tool->mouseButtonEvent(p, button, down, modifiers, pos, *inlay);
     }
 
-    return false;
+    return true;
+}
+
+bool RingGLCanvas::mouseMotionEvent(const Eigen::Vector2i &p,
+                                    const Eigen::Vector2i &rel, int button,
+                                    int modifiers)
+{
+    requestFocus();
+
+    return true;
 }
 
 bool RingGLCanvas::mouseDragEvent(const Eigen::Vector2i &p,
@@ -125,7 +134,7 @@ bool RingGLCanvas::mouseDragEvent(const Eigen::Vector2i &p,
         return tool->mouseDragEvent(p, rel, button, modifiers, pos, *inlay);
     }
 
-    return false;
+    return true;
 }
 
 bool RingGLCanvas::keyboardEvent(int key, int scancode, int action,
@@ -148,7 +157,7 @@ bool RingGLCanvas::scrollEvent(const Eigen::Vector2i &p,
                                const Eigen::Vector2f &rel)
 {
     mvp(3, 3) += (rel(1) > 0) ? -0.4 : 0.4;
-    return false;
+    return true;
 }
 
 void RingGLCanvas::drawGL()
