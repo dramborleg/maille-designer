@@ -4,7 +4,7 @@
 RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
                            std::shared_ptr<Tool> tool)
     : nanogui::GLCanvas(parent)
-    , inlay(inlay)
+    , inlay(std::move(inlay))
 {
     mShader.init(
         /* An identifying name */
@@ -59,7 +59,7 @@ RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
     mvp.setIdentity();
     mvp(3, 3) = 8.0;
 
-    setTool(tool);
+    setTool(std::move(tool));
 }
 
 void RingGLCanvas::uploadRingData()

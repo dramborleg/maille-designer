@@ -5,8 +5,8 @@
 WeaveAddTool::WeaveAddTool(int icon, std::shared_ptr<Weave> weaveManager,
                            std::shared_ptr<Eigen::Vector3f> fgcolor)
     : Tool(icon)
-    , weaveManager(weaveManager)
-    , fgcolor(fgcolor)
+    , weaveManager(std::move(weaveManager))
+    , fgcolor(std::move(fgcolor))
 {
 }
 
