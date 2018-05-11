@@ -4,10 +4,10 @@
 #include "european4in1.h"
 
 European4in1::European4in1(float radius, float thickness)
-    : radius(radius)
-    , thickness(thickness)
 {
     theta = atan(1.5 * thickness / radius);
+    xDist = 1.85 * radius - 2 * thickness;
+    yDist = radius - thickness;
     // clang-format off
     rot0 << 1.0, 0.0, 0.0, 0.0,
             0.0, cos(theta), -sin(theta), 0.0,
@@ -37,8 +37,6 @@ void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
             throw std::domain_error("Ring with given index not found\n");
 
         Eigen::Vector2f nearCenter = near->second->get_center();
-        float xDist = 1.85 * radius - 2 * thickness;
-        float yDist = radius - thickness;
         curX = nearIdx.first;
         curY = nearIdx.second;
 
@@ -46,24 +44,22 @@ void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
             worldClickLoc(1) < nearCenter(1))
         {
             idx = std::make_pair(--curX, --curY);
-            t->set_center(nearCenter(0) - xDist, nearCenter(1) - yDist);
         }
         else if (worldClickLoc(0) < nearCenter(0))
         {
             idx = std::make_pair(--curX, ++curY);
-            t->set_center(nearCenter(0) - xDist, nearCenter(1) + yDist);
         }
         else if (worldClickLoc(0) > nearCenter(0) &&
                  worldClickLoc(1) < nearCenter(1))
         {
             idx = std::make_pair(++curX, --curY);
-            t->set_center(nearCenter(0) + xDist, nearCenter(1) - yDist);
         }
         else
         {
             idx = std::make_pair(++curX, ++curY);
-            t->set_center(nearCenter(0) + xDist, nearCenter(1) + yDist);
         }
+
+        t->set_center(idx.first * xDist, idx.second * yDist);
     }
     catch (std::domain_error &e)
     {
@@ -80,6 +76,43 @@ void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
         inlay.rings.push_back(t);
         inlay.ringsModified = true;
     }
+}
+
+void European4in1::addRingsInArea(const Eigen::Vector2f &begin,
+                                  const Eigen::Vector2f &end,
+                                  const Eigen::Vector3f &color,
+                                  MailleInlay &inlay)
+{
+    int minIdxX, minIdxY, maxIdxX, maxIdxY;
+    int yBeginEven, yBeginOdd;
+
+    minIdxX = std::min(begin(0), end(0)) / xDist;
+    minIdxY = std::min(begin(1), end(1)) / yDist;
+    maxIdxX = std::max(begin(0), end(0)) / xDist;
+    maxIdxY = std::max(begin(1), end(1)) / yDist;
+
+    yBeginEven = (minIdxY % 2) ? (minIdxY + 1) : minIdxY;
+    yBeginOdd = (minIdxY % 2) ? minIdxY : (minIdxY + 1);
+
+    for (int x = minIdxX; x <= maxIdxX; x++)
+    {
+        for (int y = (x % 2) ? yBeginOdd : yBeginEven; y <= maxIdxY; y += 2)
+        {
+            auto idx = std::make_pair(x, y);
+            if (rings.find(idx) == rings.end())
+            {
+                auto t = std::make_shared<Torus>(color);
+                t->set_center(idx.first * xDist, idx.second * yDist);
+                t->set_rotation(x % 2 ? rot1 : rot0);
+
+                rings[idx] = t;
+                inlay.rings.push_back(t);
+                inlay.ringsModified = true;
+            }
+        }
+    }
+
+    return;
 }
 
 void European4in1::deleteRing(const Eigen::Vector2f &worldClickLoc,
