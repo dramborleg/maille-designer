@@ -12,7 +12,7 @@
 #include "weaves/european4in1.h"
 
 MailleScreen::MailleScreen()
-    : nanogui::Screen(Eigen::Vector2i(800, 600), "Maille Designer", false)
+    : nanogui::Screen(Eigen::Vector2i(800, 600), "Maille Designer", true)
 {
     using namespace nanogui;
 
@@ -86,10 +86,4 @@ MailleScreen::MailleScreen()
         [this]() { selectionTool->setSelectionColor(*inlay, *fgcolor); });
 
     performLayout();
-}
-
-void MailleScreen::draw(NVGcontext *ctx)
-{
-    /* Draw the user interface */
-    Screen::draw(ctx);
 }
