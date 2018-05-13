@@ -15,54 +15,52 @@ bool SelectionTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
                                      const Eigen::Vector2f &worldPos,
                                      MailleInlay &inlay)
 {
-    if (!down || inlay.rings.empty())
+    if (inlay.rings.empty())
         return true;
 
-    bool isSelected = false;
-    float nearDist = std::numeric_limits<float>::max();
-    std::shared_ptr<Torus> nearest;
-    std::vector<std::shared_ptr<Torus>>::iterator rSelected;
-
-    for (const auto &r : inlay.rings)
+    if (down)
     {
-        Eigen::Vector2f center = r->get_center();
-        float dist = (worldPos - center).norm();
-
-        if (dist < nearDist)
-        {
-            nearest = r;
-            nearDist = dist;
-        }
-    }
-
-    if (nearDist > 2 * nearest->get_radius())
-    {
-        inlay.selectedRings.clear();
+        dragBeginWorld = worldPos;
         return true;
     }
 
     if (!ctrlDown)
+        inlay.selectedRings.clear();
+
+    if (dragEvent)
+        return handleDragEvent(worldPos, inlay);
+
+    auto nearest = findNearestRing(inlay, worldPos);
+
+    if (nearest.second > 2 * nearest.first->get_radius())
     {
         inlay.selectedRings.clear();
-        inlay.selectedRings.push_back(nearest);
         return true;
     }
 
-    for (auto r = inlay.selectedRings.begin(); r != inlay.selectedRings.end();
-         r++)
+    if (ctrlDown)
     {
-        if ((*r)->hasSameCenter(*nearest))
-        {
-            isSelected = true;
-            rSelected = r;
-            break;
-        }
+        auto rSelected = findSelectedRing(inlay, *nearest.first);
+        if (rSelected != inlay.selectedRings.cend())
+            inlay.selectedRings.erase(rSelected);
+        else
+            inlay.selectedRings.push_back(nearest.first);
     }
-    if (isSelected)
-        inlay.selectedRings.erase(rSelected);
     else
-        inlay.selectedRings.push_back(nearest);
+    {
+        inlay.selectedRings.push_back(nearest.first);
+    }
 
+    return true;
+}
+
+bool SelectionTool::mouseDragEvent(const Eigen::Vector2i &p,
+                                   const Eigen::Vector2i &rel, int button,
+                                   int modifiers,
+                                   const Eigen::Vector2f &worldPos,
+                                   MailleInlay &inlay)
+{
+    dragEvent = true;
     return true;
 }
 
@@ -111,4 +109,70 @@ void SelectionTool::setSelectionColor(MailleInlay &inlay,
 {
     for (auto &r : inlay.selectedRings)
         r->set_color(color);
+}
+
+std::vector<std::shared_ptr<Torus>>::const_iterator
+SelectionTool::findSelectedRing(const MailleInlay &inlay,
+                                const Torus &ring) const
+{
+    auto r = inlay.selectedRings.cbegin();
+
+    for (; r != inlay.selectedRings.cend(); r++)
+    {
+        if ((*r)->hasSameCenter(ring))
+            break;
+    }
+
+    return r;
+}
+
+std::pair<std::shared_ptr<Torus>, float>
+SelectionTool::findNearestRing(const MailleInlay &inlay,
+                               const Eigen::Vector2f &worldPos) const
+{
+    if (inlay.rings.empty())
+        throw std::domain_error("Nearest ring undefined\n");
+
+    float nearDist = std::numeric_limits<float>::max();
+    std::shared_ptr<Torus> nearest;
+
+    for (const auto &r : inlay.rings)
+    {
+        Eigen::Vector2f center = r->get_center();
+        float dist = (worldPos - center).norm();
+
+        if (dist < nearDist)
+        {
+            nearest = r;
+            nearDist = dist;
+        }
+    }
+
+    return std::make_pair(nearest, nearDist);
+}
+
+bool SelectionTool::handleDragEvent(const Eigen::Vector2f &worldPos,
+                                    MailleInlay &inlay)
+{
+    dragEvent = false;
+
+    Eigen::Vector2f maxCoord(std::max(dragBeginWorld(0), worldPos(0)),
+                             std::max(dragBeginWorld(1), worldPos(1)));
+    Eigen::Vector2f minCoord(std::min(dragBeginWorld(0), worldPos(0)),
+                             std::min(dragBeginWorld(1), worldPos(1)));
+    for (const auto &r : inlay.rings)
+    {
+        Eigen::Vector2f loc = r->get_center();
+        if (loc(0) > minCoord(0) && loc(0) < maxCoord(0) &&
+            loc(1) > minCoord(1) && loc(1) < maxCoord(1))
+        {
+            auto rSelected = findSelectedRing(inlay, *r);
+            if (rSelected != inlay.selectedRings.cend())
+                inlay.selectedRings.erase(rSelected);
+            else
+                inlay.selectedRings.push_back(r);
+        }
+    }
+
+    return true;
 }
