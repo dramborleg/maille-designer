@@ -4,6 +4,7 @@
 RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
                            std::shared_ptr<Tool> tool)
     : nanogui::GLCanvas(parent)
+    , zoom(8.0)
     , inlay(std::move(inlay))
 {
     mShader.init(
@@ -57,8 +58,7 @@ RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
     lDirection.normalize();
 
     mvp.setIdentity();
-    mvp(3, 3) = 8.0;
-
+    setZoom();
     setTool(std::move(tool));
 }
 
@@ -152,8 +152,16 @@ bool RingGLCanvas::keyboardEvent(int key, int scancode, int action,
 bool RingGLCanvas::scrollEvent(const Eigen::Vector2i &p,
                                const Eigen::Vector2f &rel)
 {
-    mvp(3, 3) += (rel(1) > 0) ? -0.4 : 0.4;
+    zoom += (rel(1) > 0) ? -0.4 : 0.4;
+    setZoom();
     return true;
+}
+
+void RingGLCanvas::resize(const Eigen::Vector2i &size)
+{
+    setSize(size);
+    setZoom();
+    mvp(1, 1) = (float)width() / height();
 }
 
 void RingGLCanvas::drawGL()
@@ -237,3 +245,5 @@ bool RingGLCanvas::ringIsSelected(const Torus &t)
 
     return false;
 }
+
+void RingGLCanvas::setZoom() { mvp(3, 3) = zoom * width() / 600.0; }

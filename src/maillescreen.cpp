@@ -34,7 +34,7 @@ MailleScreen::MailleScreen()
     mCanvas = new RingGLCanvas(this, inlay, adderTool);
     mCanvas->setPosition(Vector2i(200, 0));
     mCanvas->setBackgroundColor({100, 100, 100, 255});
-    mCanvas->setSize({600, 600});
+    mCanvas->resize({600, 600});
 
     // Tool Palette and Widget Window
     Window *palette = new Window(this, "Tools");
@@ -86,4 +86,11 @@ MailleScreen::MailleScreen()
         [this]() { selectionTool->setSelectionColor(*inlay, *fgcolor); });
 
     performLayout();
+}
+
+bool MailleScreen::resizeEvent(const Eigen::Vector2i &size)
+{
+    auto position = mCanvas->position();
+    mCanvas->resize({size(0) - position(0), size(1)});
+    return true;
 }

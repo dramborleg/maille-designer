@@ -29,6 +29,7 @@ public:
                                int modifiers) override;
     virtual bool scrollEvent(const Eigen::Vector2i &p,
                              const Eigen::Vector2f &rel) override;
+    void resize(const Eigen::Vector2i &size);
 
     virtual void drawGL() override;
 
@@ -36,6 +37,7 @@ private:
     void uploadRingData();
     Eigen::Vector2f canvasToWorld(const Eigen::Vector2i &p);
     bool ringIsSelected(const Torus &t);
+    void setZoom();
 
     nanogui::GLShader mShader;
     // model view projection matrix
@@ -44,6 +46,8 @@ private:
     Eigen::Vector3f lDirection;
     // ambient, diffuse, and specular light intensities
     float aIntensity, dIntensity, sIntensity;
+    // zoom level
+    float zoom;
     // the inlay being displayed on this canvas
     std::shared_ptr<MailleInlay> inlay;
     // currently selected tool
