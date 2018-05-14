@@ -19,9 +19,11 @@ public:
     float get_shininess() const { return shininess; }
     unsigned get_num_samples_radius() const { return nTheta; }
     unsigned get_num_samples_cross_section() const { return nAlpha; }
+    bool get_selected() const { return selected; }
     void set_rotation(nanogui::Matrix4f rotation);
     void set_center(float x, float y);
     void set_color(const nanogui::Vector3f &color) { this->color = color; }
+    void set_selected(bool sel) { selected = sel; }
     nanogui::Vector2f get_center() const;
     bool hasSameCenter(const Torus &t) const;
 
@@ -32,6 +34,7 @@ private:
     void compute_points();
     void compute_normals();
 
+    bool selected;
     float r;
     float shininess;
     float thickness;

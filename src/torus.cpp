@@ -1,7 +1,8 @@
 #include "torus.h"
 
 Torus::Torus(nanogui::Vector3f color, float radius, float thickness)
-    : r(radius)
+    : selected(true)
+    , r(radius)
     , shininess(1.0)
     , thickness(thickness)
     , nTheta(32)

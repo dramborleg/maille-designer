@@ -15,6 +15,5 @@ struct MailleInlay
 {
     float ambientIntensity;
     std::vector<std::shared_ptr<Torus>> rings;
-    std::vector<std::shared_ptr<Torus>> selectedRings;
     bool ringsModified;
 };

@@ -8,6 +8,7 @@ class SelectionTool : public Tool
 public:
     SelectionTool(int icon, std::shared_ptr<Weave> weaveManager);
 
+    void load(MailleInlay &inlay);
     void unload(MailleInlay &inlay);
     bool mouseButtonEvent(const Eigen::Vector2i &p, int button, bool down,
                           int modifiers, const Eigen::Vector2f &worldPos,
@@ -21,14 +22,12 @@ public:
     void setSelectionColor(MailleInlay &inlay, const Eigen::Vector3f &color);
 
 private:
-    std::vector<std::shared_ptr<Torus>>::const_iterator
-    findSelectedRing(const MailleInlay &inlay, const Torus &ring) const;
-
     std::pair<std::shared_ptr<Torus>, float>
     findNearestRing(const MailleInlay &inlay,
                     const Eigen::Vector2f &worldPos) const;
 
     bool handleDragEvent(const Eigen::Vector2f &worldPos, MailleInlay &inlay);
+    void setSelection(MailleInlay &inlay, bool selected);
 
     bool dragEvent;
     Eigen::Vector2f dragBeginWorld;

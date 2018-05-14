@@ -135,16 +135,6 @@ void European4in1::deleteRing(const Eigen::Vector2f &worldClickLoc,
             }
         }
 
-        for (auto r = inlay.selectedRings.begin();
-             r != inlay.selectedRings.end(); r++)
-        {
-            if ((*r)->hasSameCenter(*near->second))
-            {
-                inlay.selectedRings.erase(r);
-                break;
-            }
-        }
-
         rings.erase(near);
     }
     catch (std::domain_error &e)

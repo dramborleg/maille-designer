@@ -8,7 +8,9 @@ SelectionTool::SelectionTool(int icon, std::shared_ptr<Weave> weaveManager)
 {
 }
 
-void SelectionTool::unload(MailleInlay &inlay) { inlay.selectedRings.clear(); }
+void SelectionTool::load(MailleInlay &inlay) { setSelection(inlay, false); }
+
+void SelectionTool::unload(MailleInlay &inlay) { setSelection(inlay, true); }
 
 bool SelectionTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
                                      bool down, int modifiers,
@@ -25,7 +27,7 @@ bool SelectionTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
     }
 
     if (!ctrlDown)
-        inlay.selectedRings.clear();
+        setSelection(inlay, false);
 
     if (dragEvent)
         return handleDragEvent(worldPos, inlay);
@@ -34,22 +36,14 @@ bool SelectionTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
 
     if (nearest.second > 2 * nearest.first->get_radius())
     {
-        inlay.selectedRings.clear();
+        setSelection(inlay, false);
         return true;
     }
 
     if (ctrlDown)
-    {
-        auto rSelected = findSelectedRing(inlay, *nearest.first);
-        if (rSelected != inlay.selectedRings.cend())
-            inlay.selectedRings.erase(rSelected);
-        else
-            inlay.selectedRings.push_back(nearest.first);
-    }
+        nearest.first->set_selected(!nearest.first->get_selected());
     else
-    {
-        inlay.selectedRings.push_back(nearest.first);
-    }
+        nearest.first->set_selected(true);
 
     return true;
 }
@@ -83,12 +77,7 @@ bool SelectionTool::keyboardEvent(int key, int scancode, int action,
     else if (key == GLFW_KEY_A)
     {
         if (action && ctrlDown)
-        {
-            inlay.selectedRings.clear();
-
-            for (const auto &ring : inlay.rings)
-                inlay.selectedRings.push_back(ring);
-        }
+            setSelection(inlay, true);
     }
     else
     {
@@ -100,30 +89,32 @@ bool SelectionTool::keyboardEvent(int key, int scancode, int action,
 
 void SelectionTool::deleteSelection(MailleInlay &inlay)
 {
-    while (!inlay.selectedRings.empty())
-        weaveManager->deleteRing(inlay.selectedRings[0]->get_center(), inlay);
+    bool deleted = true;
+
+    // This while loop is used instead of a simple for loop because we are
+    // deleting elements from the vector while looping through it, so care
+    // must be taken to avoid corrupting the iterators.
+    while (deleted)
+    {
+        deleted = false;
+
+        for (const auto &r : inlay.rings)
+        {
+            if (r->get_selected())
+            {
+                weaveManager->deleteRing(r->get_center(), inlay);
+                deleted = true;
+                break;
+            }
+        }
+    }
 }
 
 void SelectionTool::setSelectionColor(MailleInlay &inlay,
                                       const Eigen::Vector3f &color)
 {
-    for (auto &r : inlay.selectedRings)
+    for (auto &r : inlay.rings)
         r->set_color(color);
-}
-
-std::vector<std::shared_ptr<Torus>>::const_iterator
-SelectionTool::findSelectedRing(const MailleInlay &inlay,
-                                const Torus &ring) const
-{
-    auto r = inlay.selectedRings.cbegin();
-
-    for (; r != inlay.selectedRings.cend(); r++)
-    {
-        if ((*r)->hasSameCenter(ring))
-            break;
-    }
-
-    return r;
 }
 
 std::pair<std::shared_ptr<Torus>, float>
@@ -166,13 +157,15 @@ bool SelectionTool::handleDragEvent(const Eigen::Vector2f &worldPos,
         if (loc(0) > minCoord(0) && loc(0) < maxCoord(0) &&
             loc(1) > minCoord(1) && loc(1) < maxCoord(1))
         {
-            auto rSelected = findSelectedRing(inlay, *r);
-            if (rSelected != inlay.selectedRings.cend())
-                inlay.selectedRings.erase(rSelected);
-            else
-                inlay.selectedRings.push_back(r);
+            r->set_selected(!r->get_selected());
         }
     }
 
     return true;
+}
+
+void SelectionTool::setSelection(MailleInlay &inlay, bool selected)
+{
+    for (auto &r : inlay.rings)
+        r->set_selected(selected);
 }
