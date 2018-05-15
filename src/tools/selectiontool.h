@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common.h"
 #include "tool.h"
 #include "weaves/weave.h"
 
@@ -19,7 +20,7 @@ public:
     bool keyboardEvent(int key, int scancode, int action, int modifiers,
                        MailleInlay &inlay);
     void deleteSelection(MailleInlay &inlay);
-    void setSelectionColor(MailleInlay &inlay, const Eigen::Vector3f &color);
+    void setSelectionColor(MailleInlay &inlay, const Maille::Color &color);
 
 private:
     std::pair<std::shared_ptr<Torus>, float>

@@ -2,19 +2,21 @@
 
 #include <nanogui/common.h>
 
+#include "common.h"
+
 class Torus
 {
 public:
-    Torus(nanogui::Vector3f color = nanogui::Vector3f(1.0, 0.0, 0.0),
-          float radius = 1.0, float thickness = 0.278);
+    Torus(Maille::Color color = Maille::Color(255, 0, 0), float radius = 1.0,
+          float thickness = 0.278);
     Torus(float radius, float thickness, unsigned numSamplesRadius = 32,
           unsigned numSamplesCrossSection = 16, float shininess = 1.0,
-          nanogui::Vector3f color = nanogui::Vector3f(0.0, 0.0, 0.0));
+          Maille::Color color = Maille::Color(255, 0, 0));
 
     nanogui::MatrixXf get_positions() const;
     nanogui::MatrixXf get_normals() const;
     const nanogui::MatrixXu &get_indices() const { return indices; }
-    const nanogui::Vector3f &get_color() const { return color; }
+    const Maille::Color &get_color() const { return color; }
     float get_radius() const { return r; }
     float get_shininess() const { return shininess; }
     unsigned get_num_samples_radius() const { return nTheta; }
@@ -22,7 +24,7 @@ public:
     bool get_selected() const { return selected; }
     void set_rotation(nanogui::Matrix4f rotation);
     void set_center(float x, float y);
-    void set_color(const nanogui::Vector3f &color) { this->color = color; }
+    void set_color(const Maille::Color &color) { this->color = color; }
     void set_selected(bool sel) { selected = sel; }
     nanogui::Vector2f get_center() const;
     bool hasSameCenter(const Torus &t) const;
@@ -45,7 +47,7 @@ private:
     nanogui::MatrixXu indices;
     nanogui::Matrix4f rotation;
     nanogui::Matrix4f translation;
-    nanogui::Vector3f color;
+    Maille::Color color;
 
     // pre-calculated normals and positions
     nanogui::MatrixXf transformed_points;

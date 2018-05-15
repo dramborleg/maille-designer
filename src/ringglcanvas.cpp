@@ -197,7 +197,9 @@ void RingGLCanvas::drawGL()
     for (size_t i = 0; i < inlay->rings.size(); i++)
     {
         // set ring color and shininess
-        mShader.setUniform("ringColor", inlay->rings[i]->get_color());
+        auto c = inlay->rings[i]->get_color();
+        Eigen::Vector3f color(c(0) / 255.0, c(1) / 255.0, c(2) / 255.0);
+        mShader.setUniform("ringColor", color);
         mShader.setUniform("shininess", inlay->rings[i]->get_shininess());
         mShader.setUniform("selected", inlay->rings[i]->get_selected());
 

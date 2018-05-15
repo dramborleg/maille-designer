@@ -1,5 +1,6 @@
 #include <GLFW/glfw3.h>
 
+#include "common.h"
 #include "selectiontool.h"
 
 SelectionTool::SelectionTool(int icon, std::shared_ptr<Weave> weaveManager)
@@ -111,7 +112,7 @@ void SelectionTool::deleteSelection(MailleInlay &inlay)
 }
 
 void SelectionTool::setSelectionColor(MailleInlay &inlay,
-                                      const Eigen::Vector3f &color)
+                                      const Maille::Color &color)
 {
     for (auto &r : inlay.rings)
         r->set_color(color);

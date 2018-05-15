@@ -5,6 +5,7 @@
 #include <nanogui/slider.h>
 #include <nanogui/window.h>
 
+#include "common.h"
 #include "maillescreen.h"
 #include "ringglcanvas.h"
 #include "tools/selectiontool.h"
@@ -21,7 +22,7 @@ MailleScreen::MailleScreen()
     inlay->ambientIntensity = 0.5;
 
     // Initialize foreground color
-    fgcolor = std::make_shared<Eigen::Vector3f>(1.0, 0.0, 0.0);
+    fgcolor = std::make_shared<Maille::Color>(255, 0, 0);
 
     // Initialize tools
     auto weaveManager = std::make_shared<European4in1>();
@@ -65,7 +66,10 @@ MailleScreen::MailleScreen()
         [this](float val) { mCanvas->setAmbientIntensityFactor(val); });
     // Global foreground color selector
     ColorWheel *wheel = new ColorWheel(palette);
-    wheel->setCallback([this](const Color &col) { *fgcolor = col.head(3); });
+    wheel->setCallback([this](const Color &col) {
+        Maille::Color color(255 * col(0), 255 * col(1), 255 * col(2));
+        *fgcolor = color;
+    });
 
     // Tool specific buttons
     new Label(palette, "Tool operations", "sans-bold");

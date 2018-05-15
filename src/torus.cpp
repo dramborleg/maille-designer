@@ -1,6 +1,7 @@
 #include "torus.h"
+#include "common.h"
 
-Torus::Torus(nanogui::Vector3f color, float radius, float thickness)
+Torus::Torus(Maille::Color color, float radius, float thickness)
     : selected(true)
     , r(radius)
     , shininess(1.0)
@@ -16,7 +17,7 @@ Torus::Torus(nanogui::Vector3f color, float radius, float thickness)
 
 Torus::Torus(float radius, float thickness, unsigned numSamplesRadius,
              unsigned numSamplesCrossSection, float shininess,
-             nanogui::Vector3f color)
+             Maille::Color color)
     : r(radius)
     , shininess(shininess)
     , thickness(thickness)

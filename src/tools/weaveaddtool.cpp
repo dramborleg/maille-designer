@@ -1,9 +1,10 @@
 #include <cmath>
 
+#include "common.h"
 #include "weaveaddtool.h"
 
 WeaveAddTool::WeaveAddTool(int icon, std::shared_ptr<Weave> weaveManager,
-                           std::shared_ptr<Eigen::Vector3f> fgcolor)
+                           std::shared_ptr<Maille::Color> fgcolor)
     : Tool(icon)
     , weaveManager(std::move(weaveManager))
     , fgcolor(std::move(fgcolor))

@@ -1,6 +1,7 @@
 #include <cmath>
 #include <stdexcept>
 
+#include "common.h"
 #include "european4in1.h"
 
 European4in1::European4in1(float radius, float thickness)
@@ -21,7 +22,7 @@ European4in1::European4in1(float radius, float thickness)
 }
 
 void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
-                           const Eigen::Vector3f &color, MailleInlay &inlay)
+                           const Maille::Color &color, MailleInlay &inlay)
 {
     std::pair<int, int> idx;
     std::pair<int, int> nearIdx;
@@ -80,7 +81,7 @@ void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
 
 void European4in1::addRingsInArea(const Eigen::Vector2f &begin,
                                   const Eigen::Vector2f &end,
-                                  const Eigen::Vector3f &color,
+                                  const Maille::Color &color,
                                   MailleInlay &inlay)
 {
     int minIdxX, minIdxY, maxIdxX, maxIdxY;

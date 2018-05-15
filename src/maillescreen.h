@@ -2,6 +2,7 @@
 
 #include <nanogui/screen.h>
 
+#include "common.h"
 #include "mailleinlay.h"
 
 class RingGLCanvas;
@@ -24,5 +25,5 @@ private:
     std::shared_ptr<WeaveAddTool> adderTool;
     std::shared_ptr<SelectionTool> selectionTool;
     // Global foreground color
-    std::shared_ptr<Eigen::Vector3f> fgcolor;
+    std::shared_ptr<Maille::Color> fgcolor;
 };
