@@ -24,6 +24,7 @@ private:
     // Tools
     std::shared_ptr<WeaveAddTool> adderTool;
     std::shared_ptr<SelectionTool> selectionTool;
+    std::shared_ptr<Tool> curTool;
     // Global foreground color
     std::shared_ptr<Maille::Color> fgcolor;
 };

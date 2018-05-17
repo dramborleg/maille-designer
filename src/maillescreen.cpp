@@ -30,9 +30,10 @@ MailleScreen::MailleScreen()
         std::make_shared<WeaveAddTool>(ENTYPO_ICON_PLUS, weaveManager, fgcolor);
     selectionTool = std::make_shared<SelectionTool>(ENTYPO_ICON_MOUSE_POINTER,
                                                     weaveManager);
+    curTool = adderTool;
 
     // Ring Canvas
-    mCanvas = new RingGLCanvas(this, inlay, adderTool);
+    mCanvas = new RingGLCanvas(this, inlay, curTool);
     mCanvas->setPosition(Vector2i(200, 0));
     mCanvas->setBackgroundColor({100, 100, 100, 255});
     mCanvas->resize({600, 600});
@@ -51,12 +52,18 @@ MailleScreen::MailleScreen()
     b->setFlags(Button::RadioButton);
     b->setTooltip("Add Rings");
     b->setPushed(true);
-    b->setCallback([this]() { mCanvas->setTool(adderTool); });
+    b->setCallback([this]() {
+        mCanvas->setTool(adderTool);
+        curTool = adderTool;
+    });
     // Ring selection tool button
     b = new Button(toolsWidget, "", selectionTool->getIcon());
     b->setFlags(Button::RadioButton);
     b->setTooltip("Select Rings");
-    b->setCallback([this]() { mCanvas->setTool(selectionTool); });
+    b->setCallback([this]() {
+        mCanvas->setTool(selectionTool);
+        curTool = selectionTool;
+    });
     // Brightness slider widget
     new Label(palette, "Brightness Slider", "sans-bold");
     Slider *brightness = new Slider(palette);
@@ -80,14 +87,18 @@ MailleScreen::MailleScreen()
     Button *selectionToolDelete =
         new Button(toolOperations, "", ENTYPO_ICON_TRASH);
     selectionToolDelete->setTooltip("Delete Selection");
-    selectionToolDelete->setCallback(
-        [this]() { selectionTool->deleteSelection(*inlay); });
+    selectionToolDelete->setCallback([this]() {
+        if (curTool == selectionTool)
+            selectionTool->deleteSelection(*inlay);
+    });
     // Selection tool set color button
     Button *selectionToolColor =
         new Button(toolOperations, "", ENTYPO_ICON_PALETTE);
     selectionToolColor->setTooltip("Set Selection Color");
-    selectionToolColor->setCallback(
-        [this]() { selectionTool->setSelectionColor(*inlay, *fgcolor); });
+    selectionToolColor->setCallback([this]() {
+        if (curTool == selectionTool)
+            selectionTool->setSelectionColor(*inlay, *fgcolor);
+    });
 
     performLayout();
 }

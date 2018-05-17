@@ -115,7 +115,8 @@ void SelectionTool::setSelectionColor(MailleInlay &inlay,
                                       const Maille::Color &color)
 {
     for (auto &r : inlay.rings)
-        r->set_color(color);
+        if (r->get_selected())
+            r->set_color(color);
 }
 
 std::pair<std::shared_ptr<Torus>, float>
