@@ -24,6 +24,7 @@ bool SelectionTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
     if (down)
     {
         dragBeginWorld = worldPos;
+        dragPrevWorld = worldPos;
         return true;
     }
 
@@ -31,7 +32,7 @@ bool SelectionTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
         setSelection(inlay, false);
 
     if (dragEvent)
-        return handleDragEvent(worldPos, inlay);
+        return completeDragEvent(worldPos, inlay);
 
     auto nearest = findNearestRing(inlay, worldPos);
 
@@ -55,6 +56,20 @@ bool SelectionTool::mouseDragEvent(const Eigen::Vector2i &p,
                                    const Eigen::Vector2f &worldPos,
                                    MailleInlay &inlay)
 {
+    bool inCurrent, inPrevious;
+
+    for (auto &r : inlay.rings)
+    {
+        auto center = r->get_center();
+        inCurrent = coordinateInBox(dragBeginWorld, worldPos, center);
+        inPrevious = coordinateInBox(dragBeginWorld, dragPrevWorld, center);
+        if (inCurrent)
+            r->set_selected(true);
+        else if (inPrevious)
+            r->set_selected(false);
+    }
+
+    dragPrevWorld = worldPos;
     dragEvent = true;
     return true;
 }
@@ -144,20 +159,17 @@ SelectionTool::findNearestRing(const MailleInlay &inlay,
     return std::make_pair(nearest, nearDist);
 }
 
-bool SelectionTool::handleDragEvent(const Eigen::Vector2f &worldPos,
-                                    MailleInlay &inlay)
+bool SelectionTool::completeDragEvent(const Eigen::Vector2f &worldPos,
+                                      MailleInlay &inlay)
 {
     dragEvent = false;
 
-    Eigen::Vector2f maxCoord(std::max(dragBeginWorld(0), worldPos(0)),
-                             std::max(dragBeginWorld(1), worldPos(1)));
-    Eigen::Vector2f minCoord(std::min(dragBeginWorld(0), worldPos(0)),
-                             std::min(dragBeginWorld(1), worldPos(1)));
+    if (ctrlDown)
+        return true;
+
     for (const auto &r : inlay.rings)
     {
-        Eigen::Vector2f loc = r->get_center();
-        if (loc(0) > minCoord(0) && loc(0) < maxCoord(0) &&
-            loc(1) > minCoord(1) && loc(1) < maxCoord(1))
+        if (coordinateInBox(dragBeginWorld, worldPos, r->get_center()))
         {
             r->set_selected(!r->get_selected());
         }
@@ -170,4 +182,15 @@ void SelectionTool::setSelection(MailleInlay &inlay, bool selected)
 {
     for (auto &r : inlay.rings)
         r->set_selected(selected);
+}
+
+bool SelectionTool::coordinateInBox(const Eigen::Vector2f &p0,
+                                    const Eigen::Vector2f &p1,
+                                    const Eigen::Vector2f &location)
+{
+    Eigen::Vector2f maxCoord(std::max(p0(0), p1(0)), std::max(p0(1), p1(1)));
+    Eigen::Vector2f minCoord(std::min(p0(0), p1(0)), std::min(p0(1), p1(1)));
+
+    return (location(0) > minCoord(0) && location(0) < maxCoord(0) &&
+            location(1) > minCoord(1) && location(1) < maxCoord(1));
 }

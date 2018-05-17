@@ -27,11 +27,16 @@ private:
     findNearestRing(const MailleInlay &inlay,
                     const Eigen::Vector2f &worldPos) const;
 
-    bool handleDragEvent(const Eigen::Vector2f &worldPos, MailleInlay &inlay);
+    bool completeDragEvent(const Eigen::Vector2f &worldPos, MailleInlay &inlay);
     void setSelection(MailleInlay &inlay, bool selected);
+    bool coordinateInBox(const Eigen::Vector2f &p0, const Eigen::Vector2f &p1,
+                         const Eigen::Vector2f &location);
 
     bool dragEvent;
+    // initial click position of a drag event
     Eigen::Vector2f dragBeginWorld;
+    // location of cursor during most recent drag event that was processed
+    Eigen::Vector2f dragPrevWorld;
     std::shared_ptr<Weave> weaveManager;
     bool ctrlDown;
 };
