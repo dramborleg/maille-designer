@@ -8,6 +8,7 @@
 #include "common.h"
 #include "maillescreen.h"
 #include "ringglcanvas.h"
+#include "tools/colorpickertool.h"
 #include "tools/selectiontool.h"
 #include "tools/weaveaddtool.h"
 #include "weaves/european4in1.h"
@@ -24,7 +25,7 @@ MailleScreen::MailleScreen()
     // Initialize foreground color
     fgcolor = std::make_shared<Maille::Color>(255, 0, 0);
 
-    // Initialize tools
+    // Initialize selection and adder tools
     auto weaveManager = std::make_shared<European4in1>();
     adderTool =
         std::make_shared<WeaveAddTool>(ENTYPO_ICON_PLUS, weaveManager, fgcolor);
@@ -76,6 +77,17 @@ MailleScreen::MailleScreen()
     wheel->setCallback([this](const Color &col) {
         Maille::Color color(255 * col(0), 255 * col(1), 255 * col(2));
         *fgcolor = color;
+    });
+
+    // Initialize color picker tool and button
+    colorPickerTool =
+        std::make_shared<ColorPickerTool>(ENTYPO_ICON_DROP, wheel);
+    b = new Button(toolsWidget, "", colorPickerTool->getIcon());
+    b->setFlags(Button::RadioButton);
+    b->setTooltip("Select Color Based on Existing Ring");
+    b->setCallback([this]() {
+        mCanvas->setTool(colorPickerTool);
+        curTool = colorPickerTool;
     });
 
     // Tool specific buttons

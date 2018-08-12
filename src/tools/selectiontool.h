@@ -25,10 +25,6 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
-    std::pair<std::shared_ptr<Torus>, float>
-    findNearestRing(const MailleInlay &inlay,
-                    const Eigen::Vector2f &worldPos) const;
-
     bool completeDragEvent(const Eigen::Vector2f &worldPos, MailleInlay &inlay);
     void setSelection(MailleInlay &inlay, bool selected);
     bool coordinateInBox(const Eigen::Vector2f &p0, const Eigen::Vector2f &p1,

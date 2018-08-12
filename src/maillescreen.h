@@ -5,6 +5,7 @@
 #include "common.h"
 #include "mailleinlay.h"
 
+class ColorPickerTool;
 class RingGLCanvas;
 class SelectionTool;
 class Tool;
@@ -22,6 +23,7 @@ private:
     // Global inlay state
     std::shared_ptr<MailleInlay> inlay;
     // Tools
+    std::shared_ptr<ColorPickerTool> colorPickerTool;
     std::shared_ptr<WeaveAddTool> adderTool;
     std::shared_ptr<SelectionTool> selectionTool;
     std::shared_ptr<Tool> curTool;

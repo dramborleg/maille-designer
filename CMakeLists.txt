@@ -59,6 +59,7 @@ set(SOURCE_FILES
   src/tools/simpleaddtool.h src/tools/simpleaddtool.cpp
   src/tools/weaveaddtool.h src/tools/weaveaddtool.cpp
   src/tools/selectiontool.h src/tools/selectiontool.cpp
+  src/tools/colorpickertool.h src/tools/colorpickertool.cpp
   src/weaves/weave.h
   src/weaves/european4in1.h src/weaves/european4in1.cpp
 )
