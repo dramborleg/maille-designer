@@ -22,6 +22,8 @@ public:
     void deleteSelection(MailleInlay &inlay);
     void setSelectionColor(MailleInlay &inlay, const Maille::Color &color);
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
 private:
     std::pair<std::shared_ptr<Torus>, float>
     findNearestRing(const MailleInlay &inlay,

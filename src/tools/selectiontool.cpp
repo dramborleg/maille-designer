@@ -5,7 +5,9 @@
 
 SelectionTool::SelectionTool(int icon, std::shared_ptr<Weave> weaveManager)
     : Tool(icon)
+    , dragEvent(false)
     , weaveManager(std::move(weaveManager))
+    , ctrlDown(false)
 {
 }
 

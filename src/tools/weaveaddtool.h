@@ -16,6 +16,8 @@ public:
                         int button, int modifiers,
                         const Eigen::Vector2f &worldPos, MailleInlay &inlay);
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
 private:
     bool dragEvent;
     Eigen::Vector2f dragBeginWorld;

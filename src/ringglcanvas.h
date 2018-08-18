@@ -33,6 +33,8 @@ public:
 
     virtual void drawGL() override;
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
 private:
     void uploadRingData();
     Eigen::Vector2f canvasToWorld(const Eigen::Vector2i &p);

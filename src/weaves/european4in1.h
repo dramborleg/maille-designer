@@ -17,6 +17,8 @@ public:
                         MailleInlay &inlay);
     void deleteRing(const Eigen::Vector2f &worldClickLoc, MailleInlay &inlay);
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
 private:
     std::pair<int, int> nearestRing(const Eigen::Vector2f &loc);
     Eigen::Matrix4f rot0, rot1;
