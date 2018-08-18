@@ -15,6 +15,7 @@ public:
     ~RingGLCanvas() { mShader.free(); }
 
     void setAmbientIntensityFactor(float iFactor);
+    void applyViewTransformation(Eigen::Matrix4f transform);
     void setTool(std::shared_ptr<Tool> t);
     float getAmbientIntensityFactor() const { return inlay->ambientIntensity; }
     virtual bool mouseButtonEvent(const Eigen::Vector2i &p, int button,

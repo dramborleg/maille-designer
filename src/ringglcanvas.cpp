@@ -217,6 +217,11 @@ void RingGLCanvas::setAmbientIntensityFactor(float iFactor)
     inlay->ambientIntensity = iFactor;
 }
 
+void RingGLCanvas::applyViewTransformation(Eigen::Matrix4f transform)
+{
+    mvp *= transform;
+}
+
 void RingGLCanvas::setTool(std::shared_ptr<Tool> t)
 {
     if (tool)

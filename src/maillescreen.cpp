@@ -111,6 +111,26 @@ MailleScreen::MailleScreen()
         if (curTool == selectionTool)
             selectionTool->setSelectionColor(*inlay, *fgcolor);
     });
+    // View rotation buttons
+    Button *rotateClockwise = new Button(toolOperations, "", ENTYPO_ICON_CW);
+    rotateClockwise->setTooltip("Rotate Clockwise");
+    rotateClockwise->setCallback([this]() {
+        Eigen::Matrix4f rot = Eigen::Matrix4f::Identity();
+        rot(0, 0) = rot(1, 1) = 0.0;
+        rot(1, 0) = -1.0;
+        rot(0, 1) = 1.0;
+        mCanvas->applyViewTransformation(rot);
+    });
+    Button *rotateCounterClockwise =
+        new Button(toolOperations, "", ENTYPO_ICON_CCW);
+    rotateCounterClockwise->setTooltip("Rotate Counter Clockwise");
+    rotateCounterClockwise->setCallback([this]() {
+        Eigen::Matrix4f rot = Eigen::Matrix4f::Identity();
+        rot(0, 0) = rot(1, 1) = 0.0;
+        rot(0, 1) = -1.0;
+        rot(1, 0) = 1.0;
+        mCanvas->applyViewTransformation(rot);
+    });
 
     performLayout();
 }
