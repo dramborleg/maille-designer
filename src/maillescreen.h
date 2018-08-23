@@ -19,6 +19,8 @@ public:
     bool resizeEvent(const Eigen::Vector2i &size);
 
 private:
+    void exportColorReport() const;
+
     RingGLCanvas *mCanvas;
     // Global inlay state
     std::shared_ptr<MailleInlay> inlay;

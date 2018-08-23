@@ -18,6 +18,7 @@ public:
     void applyViewTransformation(Eigen::Matrix4f transform);
     void setTool(std::shared_ptr<Tool> t);
     float getAmbientIntensityFactor() const { return inlay->ambientIntensity; }
+    std::string getColorReport() const;
     virtual bool mouseButtonEvent(const Eigen::Vector2i &p, int button,
                                   bool down, int modifiers) override;
     virtual bool mouseMotionEvent(const Eigen::Vector2i &p,

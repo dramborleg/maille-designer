@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include <nanogui/label.h>
 #include <nanogui/layout.h>
 #include <nanogui/nanogui.h>
@@ -132,6 +134,10 @@ MailleScreen::MailleScreen()
         mCanvas->applyViewTransformation(rot);
     });
 
+    Button *colorReport = new Button(palette, "Color Report", 0);
+    colorReport->setTooltip("Export Ring Color Counts");
+    colorReport->setCallback([this]() { exportColorReport(); });
+
     performLayout();
 }
 
@@ -140,4 +146,14 @@ bool MailleScreen::resizeEvent(const Eigen::Vector2i &size)
     auto position = mCanvas->position();
     mCanvas->resize({size(0) - position(0), size(1)});
     return true;
+}
+
+void MailleScreen::exportColorReport() const
+{
+    std::string fpath = nanogui::file_dialog({{"txt", "Textfile"}}, true);
+    std::string report = mCanvas->getColorReport();
+
+    fpath += ".txt";
+    std::ofstream f(fpath);
+    f.write(report.data(), report.size());
 }
