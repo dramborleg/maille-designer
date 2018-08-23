@@ -1,3 +1,6 @@
 [submodule "ext/nanogui"]
 	path = ext/nanogui
 	url = https://github.com/wjakob/nanogui.git
+[submodule "ext/cpptoml"]
+	path = ext/cpptoml
+	url = https://github.com/skystrife/cpptoml.git
