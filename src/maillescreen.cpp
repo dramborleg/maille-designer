@@ -1,4 +1,5 @@
 #include <fstream>
+#include <math.h>
 
 #include <nanogui/label.h>
 #include <nanogui/layout.h>
@@ -77,7 +78,8 @@ MailleScreen::MailleScreen()
     // Global foreground color selector
     ColorWheel *wheel = new ColorWheel(palette);
     wheel->setCallback([this](const Color &col) {
-        Maille::Color color(255 * col(0), 255 * col(1), 255 * col(2));
+        Maille::Color color(round(255 * col(0)), round(255 * col(1)),
+                            round(255 * col(2)));
         *fgcolor = color;
     });
 
