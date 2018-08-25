@@ -9,6 +9,7 @@ class ColorPickerTool;
 class RingGLCanvas;
 class SelectionTool;
 class Tool;
+class TranslationTool;
 class WeaveAddTool;
 
 class MailleScreen : public nanogui::Screen
@@ -28,6 +29,7 @@ private:
     std::shared_ptr<ColorPickerTool> colorPickerTool;
     std::shared_ptr<WeaveAddTool> adderTool;
     std::shared_ptr<SelectionTool> selectionTool;
+    std::shared_ptr<TranslationTool> translationTool;
     std::shared_ptr<Tool> curTool;
     // Global foreground color
     std::shared_ptr<Maille::Color> fgcolor;

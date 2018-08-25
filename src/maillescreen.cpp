@@ -13,6 +13,7 @@
 #include "ringglcanvas.h"
 #include "tools/colorpickertool.h"
 #include "tools/selectiontool.h"
+#include "tools/translationtool.h"
 #include "tools/weaveaddtool.h"
 #include "weaves/european4in1.h"
 
@@ -34,6 +35,7 @@ MailleScreen::MailleScreen()
         std::make_shared<WeaveAddTool>(ENTYPO_ICON_PLUS, weaveManager, fgcolor);
     selectionTool = std::make_shared<SelectionTool>(ENTYPO_ICON_MOUSE_POINTER,
                                                     weaveManager);
+    translationTool = std::make_shared<TranslationTool>(ENTYPO_ICON_HAND);
     curTool = adderTool;
 
     // Ring Canvas
@@ -67,6 +69,14 @@ MailleScreen::MailleScreen()
     b->setCallback([this]() {
         mCanvas->setTool(selectionTool);
         curTool = selectionTool;
+    });
+    // View translation tool button
+    b = new Button(toolsWidget, "", translationTool->getIcon());
+    b->setFlags(Button::RadioButton);
+    b->setTooltip("Move Camera View");
+    b->setCallback([this]() {
+        mCanvas->setTool(translationTool);
+        curTool = translationTool;
     });
     // Brightness slider widget
     new Label(palette, "Brightness Slider", "sans-bold");

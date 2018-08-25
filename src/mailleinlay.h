@@ -15,5 +15,13 @@ struct MailleInlay
 {
     float ambientIntensity;
     std::vector<std::shared_ptr<Torus>> rings;
+    // signal that rings have been added/deleted, so data must be updated in
+    // graphics buffers
     bool ringsModified;
+    // temporary transformation matrix (will normally just be identity matrix)
+    Eigen::Matrix4f transformation;
+    // model view projection matrix
+    Eigen::Matrix4f mvp;
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };

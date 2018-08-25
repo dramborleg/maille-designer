@@ -59,7 +59,8 @@ RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
     lDirection << -0.4, 0.4, -0.2;
     lDirection.normalize();
 
-    mvp.setIdentity();
+    this->inlay->mvp.setIdentity();
+    this->inlay->transformation.setIdentity();
     setZoom();
     setTool(std::move(tool));
 }
@@ -163,7 +164,7 @@ void RingGLCanvas::resize(const Eigen::Vector2i &size)
 {
     setSize(size);
     setZoom();
-    mvp(1, 1) = (float)width() / height();
+    inlay->mvp(1, 1) = (float)width() / height();
 }
 
 void RingGLCanvas::drawGL()
@@ -178,6 +179,7 @@ void RingGLCanvas::drawGL()
 
     mShader.bind();
 
+    Eigen::Matrix4f mvp = inlay->mvp * inlay->transformation;
     mShader.setUniform("modelViewProj", mvp);
 
     // set up view direction and light color (white light, not fully on)
@@ -221,7 +223,7 @@ void RingGLCanvas::setAmbientIntensityFactor(float iFactor)
 
 void RingGLCanvas::applyViewTransformation(Eigen::Matrix4f transform)
 {
-    mvp *= transform;
+    inlay->mvp *= transform;
 }
 
 void RingGLCanvas::setTool(std::shared_ptr<Tool> t)
@@ -262,10 +264,10 @@ Eigen::Vector2f RingGLCanvas::canvasToWorld(const Eigen::Vector2i &p)
     Eigen::Vector4f pos(0, 0, 0, 1);
     pos(0) = 2 * (p(0) - absolutePosition()(0)) / (float)size()(0) - 1.0;
     pos(1) = 1.0 - 2 * (p(1) - absolutePosition()(1)) / (float)size()(1);
-    pos = mvp.inverse() * pos;
+    pos = inlay->mvp.inverse() * pos;
     pos = pos / pos(3);
 
     return Eigen::Vector2f(pos(0), pos(1));
 }
 
-void RingGLCanvas::setZoom() { mvp(3, 3) = zoom * width() / 600.0; }
+void RingGLCanvas::setZoom() { inlay->mvp(3, 3) = zoom * width() / 600.0; }

@@ -43,8 +43,6 @@ private:
     void setZoom();
 
     nanogui::GLShader mShader;
-    // model view projection matrix
-    Eigen::Matrix4f mvp;
     // direction for our directional light
     Eigen::Vector3f lDirection;
     // ambient, diffuse, and specular light intensities
