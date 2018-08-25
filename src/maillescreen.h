@@ -6,6 +6,7 @@
 #include "mailleinlay.h"
 
 class ColorPickerTool;
+class PaintTool;
 class RingGLCanvas;
 class SelectionTool;
 class Tool;
@@ -30,6 +31,7 @@ private:
     std::shared_ptr<WeaveAddTool> adderTool;
     std::shared_ptr<SelectionTool> selectionTool;
     std::shared_ptr<TranslationTool> translationTool;
+    std::shared_ptr<PaintTool> paintTool;
     std::shared_ptr<Tool> curTool;
     // Global foreground color
     std::shared_ptr<Maille::Color> fgcolor;

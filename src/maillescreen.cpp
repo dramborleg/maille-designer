@@ -12,6 +12,7 @@
 #include "maillescreen.h"
 #include "ringglcanvas.h"
 #include "tools/colorpickertool.h"
+#include "tools/painttool.h"
 #include "tools/selectiontool.h"
 #include "tools/translationtool.h"
 #include "tools/weaveaddtool.h"
@@ -36,6 +37,7 @@ MailleScreen::MailleScreen()
     selectionTool = std::make_shared<SelectionTool>(ENTYPO_ICON_MOUSE_POINTER,
                                                     weaveManager);
     translationTool = std::make_shared<TranslationTool>(ENTYPO_ICON_HAND);
+    paintTool = std::make_shared<PaintTool>(ENTYPO_ICON_ROUND_BRUSH, fgcolor);
     curTool = adderTool;
 
     // Ring Canvas
@@ -51,8 +53,7 @@ MailleScreen::MailleScreen()
     // Palette label and widget for containing buttons
     new Label(palette, "Tools", "sans-bold");
     Widget *toolsWidget = new Widget(palette);
-    toolsWidget->setLayout(
-        new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 0));
+    toolsWidget->setLayout(new GridLayout(Orientation::Horizontal, 4));
     // Ring adder tool button
     Button *b = new Button(toolsWidget, "", adderTool->getIcon());
     b->setFlags(Button::RadioButton);
@@ -77,6 +78,14 @@ MailleScreen::MailleScreen()
     b->setCallback([this]() {
         mCanvas->setTool(translationTool);
         curTool = translationTool;
+    });
+    // Ring paint tool button
+    b = new Button(toolsWidget, "", paintTool->getIcon());
+    b->setFlags(Button::RadioButton);
+    b->setTooltip("Paint Existing Rings the Current Color");
+    b->setCallback([this]() {
+        mCanvas->setTool(paintTool);
+        curTool = paintTool;
     });
     // Brightness slider widget
     new Label(palette, "Brightness Slider", "sans-bold");
