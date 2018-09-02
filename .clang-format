@@ -4,3 +4,4 @@ AccessModifierOffset: -4
 BreakBeforeBraces: Allman
 BreakConstructorInitializersBeforeComma: true
 IndentWidth: 4
+IndentWrappedFunctionNames: true

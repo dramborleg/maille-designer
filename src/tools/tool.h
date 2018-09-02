@@ -35,8 +35,8 @@ public:
 
 protected:
     std::pair<std::shared_ptr<Torus>, float>
-    findNearestRing(const MailleInlay &inlay,
-                    const Eigen::Vector2f &worldPos) const
+        findNearestRing(const MailleInlay &inlay,
+                        const Eigen::Vector2f &worldPos) const
     {
         if (inlay.rings.empty())
             throw std::domain_error("Nearest ring undefined\n");

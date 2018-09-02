@@ -11,6 +11,7 @@ class RingGLCanvas;
 class SelectionTool;
 class Tool;
 class TranslationTool;
+class Weave;
 class WeaveAddTool;
 
 class MailleScreen : public nanogui::Screen
@@ -22,8 +23,11 @@ public:
 
 private:
     void exportColorReport() const;
+    void saveFile() const;
 
     RingGLCanvas *mCanvas;
+    // weave manager used by certain tools as well as for creating save files
+    std::shared_ptr<Weave> weaveManager;
     // Global inlay state
     std::shared_ptr<MailleInlay> inlay;
     // Tools

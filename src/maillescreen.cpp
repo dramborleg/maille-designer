@@ -1,3 +1,4 @@
+#include <cpptoml.h>
 #include <fstream>
 #include <math.h>
 
@@ -31,7 +32,7 @@ MailleScreen::MailleScreen()
     fgcolor = std::make_shared<Maille::Color>(255, 0, 0);
 
     // Initialize selection and adder tools
-    auto weaveManager = std::make_shared<European4in1>();
+    weaveManager = std::make_shared<European4in1>();
     adderTool =
         std::make_shared<WeaveAddTool>(ENTYPO_ICON_PLUS, weaveManager, fgcolor);
     selectionTool = std::make_shared<SelectionTool>(ENTYPO_ICON_MOUSE_POINTER,
@@ -155,9 +156,14 @@ MailleScreen::MailleScreen()
         mCanvas->applyViewTransformation(rot);
     });
 
+    // export color report button
     Button *colorReport = new Button(palette, "Color Report", 0);
     colorReport->setTooltip("Export Ring Color Counts");
     colorReport->setCallback([this]() { exportColorReport(); });
+
+    // save file and load file buttons
+    Button *saveFileButton = new Button(palette, "Save", ENTYPO_ICON_SAVE);
+    saveFileButton->setCallback([this]() { saveFile(); });
 
     performLayout();
 }
@@ -177,4 +183,17 @@ void MailleScreen::exportColorReport() const
     fpath += ".txt";
     std::ofstream f(fpath);
     f.write(report.data(), report.size());
+}
+
+void MailleScreen::saveFile() const
+{
+    std::string fpath =
+        nanogui::file_dialog({{"midf", "Maille Inlay Designer File"}}, true);
+    std::shared_ptr<cpptoml::table> saveContents =
+        weaveManager->generateSaveFile(*inlay);
+
+    if (fpath.size() < 5 || fpath.substr(fpath.size() - 5, 5) != ".midf")
+        fpath += ".midf";
+    std::ofstream f(fpath);
+    f << *saveContents;
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cpptoml.h>
+
 #include "common.h"
 #include "mailleinlay.h"
 
@@ -18,4 +20,7 @@ public:
                                 MailleInlay &inlay) = 0;
     virtual void deleteRing(const Eigen::Vector2f &worldClickLoc,
                             MailleInlay &inlay) = 0;
+    virtual std::shared_ptr<cpptoml::table>
+        generateSaveFile(const MailleInlay &inlay) const = 0;
+    virtual std::string getWeaveID() const = 0;
 };

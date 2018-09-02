@@ -1,8 +1,12 @@
 #include <cmath>
+#include <cpptoml.h>
 #include <stdexcept>
 
 #include "common.h"
 #include "european4in1.h"
+
+const std::string European4in1::weaveID = "European 4 in 1";
+const int European4in1::VERSION = 0;
 
 European4in1::European4in1(float radius, float thickness)
 {
@@ -141,6 +145,36 @@ void European4in1::deleteRing(const Eigen::Vector2f &worldClickLoc,
     catch (std::domain_error &e)
     {
     }
+}
+
+std::shared_ptr<cpptoml::table>
+    European4in1::generateSaveFile(const MailleInlay &inlay) const
+{
+    auto root = cpptoml::make_table();
+    auto indices = cpptoml::make_array();
+    auto colors = cpptoml::make_array();
+
+    for (const auto &r : rings)
+    {
+        auto idx = cpptoml::make_array();
+        auto color = cpptoml::make_array();
+        Maille::Color c = r.second->get_color();
+        idx->push_back(r.first.first);
+        idx->push_back(r.first.second);
+        color->push_back(c(0));
+        color->push_back(c(1));
+        color->push_back(c(2));
+
+        indices->push_back(idx);
+        colors->push_back(color);
+    }
+
+    root->insert("WeaveID", weaveID);
+    root->insert("Version", VERSION);
+    root->insert("Indices", indices);
+    root->insert("Colors", colors);
+
+    return root;
 }
 
 std::pair<int, int> European4in1::nearestRing(const Eigen::Vector2f &loc)
