@@ -19,7 +19,7 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
-    bool dragEvent;
+    bool dragEvent = false;
     Eigen::Vector2f dragBeginWorld;
     Eigen::Vector2i dragBeginPixel;
     std::shared_ptr<Weave> weaveManager;
