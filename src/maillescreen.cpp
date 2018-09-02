@@ -177,10 +177,29 @@ bool MailleScreen::resizeEvent(const Eigen::Vector2i &size)
 
 void MailleScreen::exportColorReport() const
 {
+    std::unordered_map<Maille::Color, unsigned, Maille::ColorHash> hist;
+    std::string report;
     std::string fpath = nanogui::file_dialog({{"txt", "Textfile"}}, true);
-    std::string report = mCanvas->getColorReport();
 
-    fpath += ".txt";
+    if (fpath.size() < 4 || fpath.substr(fpath.size() - 4, 4) != ".txt")
+        fpath += ".txt";
+
+    for (const std::shared_ptr<Torus> &ring : inlay->rings)
+    {
+        Maille::Color c = ring->get_color();
+        if (hist.count(c))
+            hist[c] += 1;
+        else
+            hist[c] = 1;
+    }
+
+    report = "r, g, b: count";
+    for (auto i = hist.begin(); i != hist.end(); i++)
+        report += "\n" + std::to_string(i->first(0)) + ", " +
+                  std::to_string(i->first(1)) + ", " +
+                  std::to_string(i->first(2)) + ": " +
+                  std::to_string(i->second);
+
     std::ofstream f(fpath);
     f.write(report.data(), report.size());
 }

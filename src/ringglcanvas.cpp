@@ -235,30 +235,6 @@ void RingGLCanvas::setTool(std::shared_ptr<Tool> t)
     tool->load(*inlay);
 }
 
-std::string RingGLCanvas::getColorReport() const
-{
-    std::string report;
-    std::unordered_map<Maille::Color, unsigned, Maille::ColorHash> hist;
-
-    for (const std::shared_ptr<Torus> &ring : inlay->rings)
-    {
-        Maille::Color c = ring->get_color();
-        if (hist.count(c))
-            hist[c] += 1;
-        else
-            hist[c] = 1;
-    }
-
-    report = "r, g, b: count";
-    for (auto i = hist.begin(); i != hist.end(); i++)
-        report += "\n" + std::to_string(i->first(0)) + ", " +
-                  std::to_string(i->first(1)) + ", " +
-                  std::to_string(i->first(2)) + ": " +
-                  std::to_string(i->second);
-
-    return report;
-}
-
 Eigen::Vector2f RingGLCanvas::canvasToWorld(const Eigen::Vector2i &p)
 {
     Eigen::Vector4f pos(0, 0, 0, 1);
