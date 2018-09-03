@@ -6,7 +6,6 @@
 RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
                            std::shared_ptr<Tool> tool)
     : nanogui::GLCanvas(parent)
-    , zoom(8.0)
     , inlay(std::move(inlay))
 {
     mShader.init(

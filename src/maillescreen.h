@@ -19,7 +19,7 @@ class MailleScreen : public nanogui::Screen
 public:
     MailleScreen();
 
-    bool resizeEvent(const Eigen::Vector2i &size);
+    bool resizeEvent(const Eigen::Vector2i &size) override;
 
 private:
     void exportColorReport() const;

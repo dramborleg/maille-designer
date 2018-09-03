@@ -7,11 +7,7 @@
 class Torus
 {
 public:
-    Torus(Maille::Color color = Maille::Color(255, 0, 0), float radius = 1.0,
-          float thickness = 0.278);
-    Torus(float radius, float thickness, unsigned numSamplesRadius = 32,
-          unsigned numSamplesCrossSection = 16, float shininess = 1.0,
-          Maille::Color color = Maille::Color(255, 0, 0));
+    Torus(const Maille::Color &color);
 
     nanogui::MatrixXf get_positions() const;
     nanogui::MatrixXf get_normals() const;
@@ -36,17 +32,17 @@ private:
     void compute_points();
     void compute_normals();
 
-    bool selected;
-    float r;
-    float shininess;
-    float thickness;
-    unsigned nTheta;
-    unsigned nAlpha;
+    bool selected = true;
+    float r = 1.0;
+    float shininess = 1.0;
+    float thickness = 0.278;
+    unsigned nTheta = 32;
+    unsigned nAlpha = 16;
     nanogui::MatrixXf positions;
     nanogui::MatrixXf normals;
     nanogui::MatrixXu indices;
-    nanogui::Matrix4f rotation;
-    nanogui::Matrix4f translation;
+    nanogui::Matrix4f rotation = nanogui::Matrix4f::Identity();
+    nanogui::Matrix4f translation = nanogui::Matrix4f::Identity();
     Maille::Color color;
 
     // pre-calculated normals and positions

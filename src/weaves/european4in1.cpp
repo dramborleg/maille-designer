@@ -9,7 +9,7 @@
 const std::string European4in1::weaveID = "European 4 in 1";
 const int European4in1::VERSION = 0;
 
-European4in1::European4in1(float radius, float thickness)
+European4in1::European4in1()
 {
     theta = atan(1.5 * thickness / radius);
     xDist = 1.85 * radius - 2 * thickness;

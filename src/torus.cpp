@@ -1,31 +1,8 @@
 #include "torus.h"
 #include "common.h"
 
-Torus::Torus(Maille::Color color, float radius, float thickness)
-    : selected(true)
-    , r(radius)
-    , shininess(1.0)
-    , thickness(thickness)
-    , nTheta(32)
-    , nAlpha(16)
-    , rotation(nanogui::Matrix4f::Identity())
-    , translation(nanogui::Matrix4f::Identity())
-    , color(color)
-{
-    init();
-}
-
-Torus::Torus(float radius, float thickness, unsigned numSamplesRadius,
-             unsigned numSamplesCrossSection, float shininess,
-             Maille::Color color)
-    : r(radius)
-    , shininess(shininess)
-    , thickness(thickness)
-    , nTheta(numSamplesRadius)
-    , nAlpha(numSamplesCrossSection)
-    , rotation(nanogui::Matrix4f::Identity())
-    , translation(nanogui::Matrix4f::Identity())
-    , color(color)
+Torus::Torus(const Maille::Color &color)
+    : color(color)
 {
     init();
 }

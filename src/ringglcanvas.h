@@ -46,7 +46,7 @@ private:
     // ambient, diffuse, and specular light intensities
     float aIntensity, dIntensity, sIntensity;
     // zoom level
-    float zoom;
+    float zoom = 8.0;
     // the inlay being displayed on this canvas
     std::shared_ptr<MailleInlay> inlay;
     // currently selected tool

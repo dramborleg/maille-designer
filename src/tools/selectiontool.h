@@ -9,16 +9,17 @@ class SelectionTool : public Tool
 public:
     SelectionTool(int icon, std::shared_ptr<Weave> weaveManager);
 
-    void load(MailleInlay &inlay);
-    void unload(MailleInlay &inlay);
+    void load(MailleInlay &inlay) override;
+    void unload(MailleInlay &inlay) override;
     bool mouseButtonEvent(const Eigen::Vector2i &p, int button, bool down,
                           int modifiers, const Eigen::Vector2f &worldPos,
-                          MailleInlay &inlay);
+                          MailleInlay &inlay) override;
     bool mouseDragEvent(const Eigen::Vector2i &p, const Eigen::Vector2i &rel,
                         int button, int modifiers,
-                        const Eigen::Vector2f &worldPos, MailleInlay &inlay);
+                        const Eigen::Vector2f &worldPos,
+                        MailleInlay &inlay) override;
     bool keyboardEvent(int key, int scancode, int action, int modifiers,
-                       MailleInlay &inlay);
+                       MailleInlay &inlay) override;
     void deleteSelection(MailleInlay &inlay);
     void setSelectionColor(MailleInlay &inlay, const Maille::Color &color);
     void setWeaveManager(std::shared_ptr<Weave> weaveManager);
@@ -31,11 +32,11 @@ private:
     bool coordinateInBox(const Eigen::Vector2f &p0, const Eigen::Vector2f &p1,
                          const Eigen::Vector2f &location);
 
-    bool dragEvent;
+    bool dragEvent = false;
+    bool ctrlDown = false;
     // initial click position of a drag event
     Eigen::Vector2f dragBeginWorld;
     // location of cursor during most recent drag event that was processed
     Eigen::Vector2f dragPrevWorld;
     std::shared_ptr<Weave> weaveManager;
-    bool ctrlDown;
 };

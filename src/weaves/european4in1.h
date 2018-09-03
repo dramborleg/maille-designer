@@ -8,18 +8,19 @@
 class European4in1 : public Weave
 {
 public:
-    European4in1(float radius = 1.0, float thickness = 0.278);
+    European4in1();
 
     void addRing(const Eigen::Vector2f &worldClickLoc,
-                 const Maille::Color &color, MailleInlay &inlay);
+                 const Maille::Color &color, MailleInlay &inlay) override;
     void addRingsInArea(const Eigen::Vector2f &begin,
                         const Eigen::Vector2f &end, const Maille::Color &color,
-                        MailleInlay &inlay);
-    void deleteRing(const Eigen::Vector2f &worldClickLoc, MailleInlay &inlay);
+                        MailleInlay &inlay) override;
+    void deleteRing(const Eigen::Vector2f &worldClickLoc,
+                    MailleInlay &inlay) override;
     std::shared_ptr<cpptoml::table>
-        generateSaveFile(const MailleInlay &inlay) const;
+        generateSaveFile(const MailleInlay &inlay) const override;
     bool importSaveFile(std::shared_ptr<cpptoml::table> design,
-                        MailleInlay &inlay);
+                        MailleInlay &inlay) override;
     static std::string getWeaveID() { return weaveID; }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -30,10 +31,14 @@ private:
                         const Maille::Color &color, MailleInlay &inlay);
     static const std::string weaveID;
     static const int VERSION;
-    Eigen::Matrix4f rot0, rot1;
+
+    float radius = 1.0;
+    float thickness = 0.278;
     float theta;
     float xDist;
     float yDist;
+    Eigen::Matrix4f rot0;
+    Eigen::Matrix4f rot1;
 
     // Rings are indexed by their (x, y) coordinate in the weave. The rotation
     // of a ring can be determined based on its x coordinate (even/odd).

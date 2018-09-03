@@ -5,10 +5,8 @@
 class Tool
 {
 public:
-    Tool(int icon)
-        : icon(icon)
-    {
-    }
+    Tool(int icon) { this->icon = icon; }
+    virtual ~Tool() = default;
 
     virtual void load(MailleInlay &inlay) {}
     virtual void unload(MailleInlay &inlay) {}

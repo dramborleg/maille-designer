@@ -10,7 +10,7 @@ class Torus;
 class Weave
 {
 public:
-    Weave() {}
+    virtual ~Weave() = default;
 
     virtual void addRing(const Eigen::Vector2f &worldClickLoc,
                          const Maille::Color &color, MailleInlay &inlay) = 0;
