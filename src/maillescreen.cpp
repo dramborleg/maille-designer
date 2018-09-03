@@ -189,6 +189,9 @@ void MailleScreen::exportColorReport() const
     std::string report;
     std::string fpath = nanogui::file_dialog({{"txt", "Textfile"}}, true);
 
+    if (fpath == "")
+        return;
+
     if (fpath.size() < 4 || fpath.substr(fpath.size() - 4, 4) != ".txt")
         fpath += ".txt";
 
@@ -216,11 +219,14 @@ void MailleScreen::saveFile() const
 {
     std::string fpath =
         nanogui::file_dialog({{"midf", "Maille Inlay Designer File"}}, true);
-    std::shared_ptr<cpptoml::table> saveContents =
-        weaveManager->generateSaveFile(*inlay);
+
+    if (fpath == "")
+        return;
 
     if (fpath.size() < 5 || fpath.substr(fpath.size() - 5, 5) != ".midf")
         fpath += ".midf";
+
+    auto saveContents = weaveManager->generateSaveFile(*inlay);
     std::ofstream f(fpath);
     f << *saveContents;
 }
@@ -229,6 +235,10 @@ void MailleScreen::loadFile()
 {
     std::string fpath =
         nanogui::file_dialog({{"midf", "Maille Inlay Designer File"}}, true);
+
+    if (fpath == "")
+        return;
+
     std::shared_ptr<cpptoml::table> design = cpptoml::parse_file(fpath);
     auto weave = design->get_as<std::string>("WeaveID");
     if (!weave)
