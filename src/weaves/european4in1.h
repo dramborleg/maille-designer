@@ -18,12 +18,16 @@ public:
     void deleteRing(const Eigen::Vector2f &worldClickLoc, MailleInlay &inlay);
     std::shared_ptr<cpptoml::table>
         generateSaveFile(const MailleInlay &inlay) const;
-    std::string getWeaveID() const { return weaveID; }
+    bool importSaveFile(std::shared_ptr<cpptoml::table> design,
+                        MailleInlay &inlay);
+    static std::string getWeaveID() { return weaveID; }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
     std::pair<int, int> nearestRing(const Eigen::Vector2f &loc);
+    bool addRingByIndex(const std::pair<int, int> &index,
+                        const Maille::Color &color, MailleInlay &inlay);
     static const std::string weaveID;
     static const int VERSION;
     Eigen::Matrix4f rot0, rot1;

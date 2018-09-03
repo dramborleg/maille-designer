@@ -161,6 +161,11 @@ void SelectionTool::setSelection(MailleInlay &inlay, bool selected)
         r->set_selected(selected);
 }
 
+void SelectionTool::setWeaveManager(std::shared_ptr<Weave> weaveManager)
+{
+    this->weaveManager = weaveManager;
+}
+
 bool SelectionTool::coordinateInBox(const Eigen::Vector2f &p0,
                                     const Eigen::Vector2f &p1,
                                     const Eigen::Vector2f &location)

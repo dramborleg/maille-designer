@@ -15,6 +15,7 @@ public:
     bool mouseDragEvent(const Eigen::Vector2i &p, const Eigen::Vector2i &rel,
                         int button, int modifiers,
                         const Eigen::Vector2f &worldPos, MailleInlay &inlay);
+    void setWeaveManager(std::shared_ptr<Weave> weaveManager);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

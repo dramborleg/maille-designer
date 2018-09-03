@@ -65,6 +65,18 @@ RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
     setTool(std::move(tool));
 }
 
+void RingGLCanvas::resetState(std::shared_ptr<Tool> tool)
+{
+    inlay->rings.clear();
+    inlay->ringsModified = true;
+    inlay->transformation.setIdentity();
+    inlay->mvp.setIdentity();
+
+    zoom = 8.0;
+    resize(size());
+    setTool(std::move(tool));
+}
+
 void RingGLCanvas::uploadRingData()
 {
     nanogui::MatrixXf positions, cur_positions;
@@ -214,11 +226,6 @@ void RingGLCanvas::drawGL()
     }
 
     glDisable(GL_DEPTH_TEST);
-}
-
-void RingGLCanvas::setAmbientIntensityFactor(float iFactor)
-{
-    inlay->ambientIntensity = iFactor;
 }
 
 void RingGLCanvas::applyViewTransformation(Eigen::Matrix4f transform)

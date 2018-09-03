@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include <cpptoml.h>
 #include <stdexcept>
@@ -30,7 +31,6 @@ void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
 {
     std::pair<int, int> idx;
     std::pair<int, int> nearIdx;
-    auto t = std::make_shared<Torus>(color);
     int curX = 0;
     int curY = 0;
 
@@ -63,24 +63,13 @@ void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
         {
             idx = std::make_pair(++curX, ++curY);
         }
-
-        t->set_center(idx.first * xDist, idx.second * yDist);
     }
     catch (std::domain_error &e)
     {
         idx = std::make_pair(curX, curY);
-        t->set_center(0.0, 0.0);
     }
 
-    t->set_rotation(curX % 2 ? rot1 : rot0);
-
-    auto idxIt = rings.find(idx);
-    if (idxIt == rings.end())
-    {
-        rings[idx] = t;
-        inlay.rings.push_back(t);
-        inlay.ringsModified = true;
-    }
+    addRingByIndex(idx, color, inlay);
 }
 
 void European4in1::addRingsInArea(const Eigen::Vector2f &begin,
@@ -177,6 +166,40 @@ std::shared_ptr<cpptoml::table>
     return root;
 }
 
+bool European4in1::importSaveFile(std::shared_ptr<cpptoml::table> design,
+                                  MailleInlay &inlay)
+{
+    bool success = true;
+    auto indices = design->get_array_of<cpptoml::array>("Indices");
+    auto colors = design->get_array_of<cpptoml::array>("Colors");
+
+    if (!indices || !colors)
+        return false;
+
+    if (indices->size() != colors->size())
+        success = false;
+
+    size_t max = std::min(indices->size(), colors->size());
+    for (size_t i = 0; i < max; i++)
+    {
+        auto idx = (*indices)[i]->get_array_of<int64_t>();
+        auto color = (*colors)[i]->get_array_of<int64_t>();
+
+        if (idx->size() != 2 || color->size() != 3)
+        {
+            success = false;
+            continue;
+        }
+
+        if (!addRingByIndex(
+                {(*idx)[0], (*idx)[1]},
+                Maille::Color((*color)[0], (*color)[1], (*color)[2]), inlay))
+            success = false;
+    }
+
+    return success;
+}
+
 std::pair<int, int> European4in1::nearestRing(const Eigen::Vector2f &loc)
 {
     if (rings.empty())
@@ -197,4 +220,22 @@ std::pair<int, int> European4in1::nearestRing(const Eigen::Vector2f &loc)
     }
 
     return nearIdx;
+}
+
+bool European4in1::addRingByIndex(const std::pair<int, int> &index,
+                                  const Maille::Color &color,
+                                  MailleInlay &inlay)
+{
+    auto idxIt = rings.find(index);
+    if (idxIt != rings.end())
+        return false;
+
+    auto t = std::make_shared<Torus>(color);
+    t->set_center(index.first * xDist, index.second * yDist);
+    t->set_rotation(index.first % 2 ? rot1 : rot0);
+    rings[index] = t;
+    inlay.rings.push_back(t);
+    inlay.ringsModified = true;
+
+    return true;
 }

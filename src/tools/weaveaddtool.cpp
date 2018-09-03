@@ -53,3 +53,8 @@ bool WeaveAddTool::mouseDragEvent(const Eigen::Vector2i &p,
     dragEvent = true;
     return true;
 }
+
+void WeaveAddTool::setWeaveManager(std::shared_ptr<Weave> weaveManager)
+{
+    this->weaveManager = weaveManager;
+}

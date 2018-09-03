@@ -24,8 +24,11 @@ public:
 private:
     void exportColorReport() const;
     void saveFile() const;
+    void loadFile();
 
     RingGLCanvas *mCanvas;
+    // list of all the tool radio buttons so they can be reset on file load
+    std::vector<nanogui::Button *> toolButtons;
     // weave manager used by certain tools as well as for creating save files
     std::shared_ptr<Weave> weaveManager;
     // Global inlay state

@@ -4,6 +4,7 @@
 
 #include <nanogui/label.h>
 #include <nanogui/layout.h>
+#include <nanogui/messagedialog.h>
 #include <nanogui/nanogui.h>
 #include <nanogui/screen.h>
 #include <nanogui/slider.h>
@@ -64,6 +65,7 @@ MailleScreen::MailleScreen()
         mCanvas->setTool(adderTool);
         curTool = adderTool;
     });
+    toolButtons.push_back(b);
     // Ring selection tool button
     b = new Button(toolsWidget, "", selectionTool->getIcon());
     b->setFlags(Button::RadioButton);
@@ -72,6 +74,7 @@ MailleScreen::MailleScreen()
         mCanvas->setTool(selectionTool);
         curTool = selectionTool;
     });
+    toolButtons.push_back(b);
     // View translation tool button
     b = new Button(toolsWidget, "", translationTool->getIcon());
     b->setFlags(Button::RadioButton);
@@ -80,6 +83,7 @@ MailleScreen::MailleScreen()
         mCanvas->setTool(translationTool);
         curTool = translationTool;
     });
+    toolButtons.push_back(b);
     // Ring paint tool button
     b = new Button(toolsWidget, "", paintTool->getIcon());
     b->setFlags(Button::RadioButton);
@@ -88,13 +92,14 @@ MailleScreen::MailleScreen()
         mCanvas->setTool(paintTool);
         curTool = paintTool;
     });
+    toolButtons.push_back(b);
     // Brightness slider widget
     new Label(palette, "Brightness Slider", "sans-bold");
     Slider *brightness = new Slider(palette);
     brightness->setTooltip("Set ambient brightness multiplier");
-    brightness->setValue(mCanvas->getAmbientIntensityFactor());
+    brightness->setValue(inlay->ambientIntensity);
     brightness->setCallback(
-        [this](float val) { mCanvas->setAmbientIntensityFactor(val); });
+        [this](float val) { inlay->ambientIntensity = val; });
     // Global foreground color selector
     ColorWheel *wheel = new ColorWheel(palette);
     wheel->setCallback([this](const Color &col) {
@@ -113,6 +118,7 @@ MailleScreen::MailleScreen()
         mCanvas->setTool(colorPickerTool);
         curTool = colorPickerTool;
     });
+    toolButtons.push_back(b);
 
     // Tool specific buttons
     new Label(palette, "Tool operations", "sans-bold");
@@ -164,6 +170,8 @@ MailleScreen::MailleScreen()
     // save file and load file buttons
     Button *saveFileButton = new Button(palette, "Save", ENTYPO_ICON_SAVE);
     saveFileButton->setCallback([this]() { saveFile(); });
+    Button *loadFileButton = new Button(palette, "Load", ENTYPO_ICON_FOLDER);
+    loadFileButton->setCallback([this]() { loadFile(); });
 
     performLayout();
 }
@@ -215,4 +223,43 @@ void MailleScreen::saveFile() const
         fpath += ".midf";
     std::ofstream f(fpath);
     f << *saveContents;
+}
+
+void MailleScreen::loadFile()
+{
+    std::string fpath =
+        nanogui::file_dialog({{"midf", "Maille Inlay Designer File"}}, true);
+    std::shared_ptr<cpptoml::table> design = cpptoml::parse_file(fpath);
+    auto weave = design->get_as<std::string>("WeaveID");
+    if (!weave)
+    {
+        new nanogui::MessageDialog(this, nanogui::MessageDialog::Type::Warning,
+                                   "File Error",
+                                   "File does not appear to be a Maille Inlay "
+                                   "Designer File, aborting file load.");
+        return;
+    }
+
+    // first figure out weave so we can ensure tools have proper weave manager
+    if (*weave != European4in1::getWeaveID())
+    {
+        new nanogui::MessageDialog(
+            this, nanogui::MessageDialog::Type::Warning, "Weave Error",
+            "Weave type " + *weave + " is not supported, aborting file load.");
+        return;
+    }
+
+    weaveManager = std::make_shared<European4in1>();
+    adderTool->setWeaveManager(weaveManager);
+    selectionTool->setWeaveManager(weaveManager);
+
+    for (const auto &b : toolButtons)
+        b->setPushed(false);
+    toolButtons[2]->setPushed(true);
+    curTool = translationTool;
+    mCanvas->resetState(curTool);
+    if (!weaveManager->importSaveFile(design, *inlay))
+        new nanogui::MessageDialog(
+            this, nanogui::MessageDialog::Type::Warning, "Import Error",
+            "Error while importing design file. Possible file corruption.");
 }

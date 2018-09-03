@@ -21,6 +21,7 @@ public:
                        MailleInlay &inlay);
     void deleteSelection(MailleInlay &inlay);
     void setSelectionColor(MailleInlay &inlay, const Maille::Color &color);
+    void setWeaveManager(std::shared_ptr<Weave> weaveManager);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
