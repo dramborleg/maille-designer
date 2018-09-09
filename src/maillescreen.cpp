@@ -234,7 +234,7 @@ void MailleScreen::saveFile() const
 void MailleScreen::loadFile()
 {
     std::string fpath =
-        nanogui::file_dialog({{"midf", "Maille Inlay Designer File"}}, true);
+        nanogui::file_dialog({{"midf", "Maille Inlay Designer File"}}, false);
 
     if (fpath == "")
         return;

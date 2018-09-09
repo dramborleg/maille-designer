@@ -1,5 +1,8 @@
-#include "torus.h"
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "common.h"
+#include "torus.h"
 
 Torus::Torus(const Maille::Color &color)
     : color(color)

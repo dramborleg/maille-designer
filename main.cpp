@@ -8,6 +8,13 @@
 
 #include "maillescreen.h"
 
+#if defined(_WIN32)
+#if defined(APIENTRY)
+#undef APIENTRY
+#endif
+#include <windows.h>
+#endif
+
 using std::endl;
 
 int main(int /* argc */, char ** /* argv */)
@@ -39,3 +46,7 @@ int main(int /* argc */, char ** /* argv */)
 
     return 0;
 }
+
+#if defined(_WIN32)
+int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) { return main(0, NULL); }
+#endif

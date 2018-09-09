@@ -1,7 +1,15 @@
 cmake_minimum_required(VERSION 3.5)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 include_directories(ext/nanogui/include)
 include_directories(ext/cpptoml/include)
+
+# Compiler specific settings
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+  # Useful for debugging build errors
+  set(CMAKE_EXE_LINKER_FLAGS "-v")
+else ()
+  add_definitions(-D_ENABLE_EXTENDED_ALIGNED_STORAGE)
+endif()
 
 # Disable building extras we won't need (pure C++ project)
 set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
@@ -72,15 +80,14 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-Wall -Wextra")
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-Wall")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_FLAGS "-W4 -WX")
 endif()
 
 # Compile a target using NanoGUI
-add_executable(maille ${SOURCE_FILES})
-
-# Useful for debugging build errors
-set(CMAKE_EXE_LINKER_FLAGS "-v")
+if (WIN32)
+  add_executable(maille WIN32 ${SOURCE_FILES})
+else ()
+  add_executable(maille ${SOURCE_FILES})
+endif()
 
 # Lastly, additional libraries may have been built for you.  In addition to linking
 # against NanoGUI, we need to link against those as well.
