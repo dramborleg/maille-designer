@@ -90,10 +90,9 @@ bool SelectionTool::keyboardEvent(int key, int scancode, int action,
         else
             ctrlDown = false;
     }
-    else if (key == GLFW_KEY_A)
+    else if (key == GLFW_KEY_A && action && ctrlDown)
     {
-        if (action && ctrlDown)
-            setSelection(inlay, true);
+        setSelection(inlay, true);
     }
     else
     {

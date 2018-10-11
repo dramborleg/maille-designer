@@ -56,43 +56,16 @@ MailleScreen::MailleScreen()
     new Label(palette, "Tools", "sans-bold");
     Widget *toolsWidget = new Widget(palette);
     toolsWidget->setLayout(new GridLayout(Orientation::Horizontal, 4));
-    // Ring adder tool button
-    Button *b = new Button(toolsWidget, "", adderTool->getIcon());
-    b->setFlags(Button::RadioButton);
-    b->setTooltip("Add Rings");
-    b->setPushed(true);
-    b->setCallback([this]() {
-        mCanvas->setTool(adderTool);
-        curTool = adderTool;
-    });
-    toolButtons.push_back(b);
-    // Ring selection tool button
-    b = new Button(toolsWidget, "", selectionTool->getIcon());
-    b->setFlags(Button::RadioButton);
-    b->setTooltip("Select Rings");
-    b->setCallback([this]() {
-        mCanvas->setTool(selectionTool);
-        curTool = selectionTool;
-    });
-    toolButtons.push_back(b);
-    // View translation tool button
-    b = new Button(toolsWidget, "", translationTool->getIcon());
-    b->setFlags(Button::RadioButton);
-    b->setTooltip("Move Camera View");
-    b->setCallback([this]() {
-        mCanvas->setTool(translationTool);
-        curTool = translationTool;
-    });
-    toolButtons.push_back(b);
-    // Ring paint tool button
-    b = new Button(toolsWidget, "", paintTool->getIcon());
-    b->setFlags(Button::RadioButton);
-    b->setTooltip("Paint Existing Rings the Current Color");
-    b->setCallback([this]() {
-        mCanvas->setTool(paintTool);
-        curTool = paintTool;
-    });
-    toolButtons.push_back(b);
+
+    // Tool buttons
+    adderButton = addToolButton(toolsWidget, adderTool, "'A'dd Rings");
+    adderButton->setPushed(true);
+    selectionButton =
+        addToolButton(toolsWidget, selectionTool, "'S'elect Rings");
+    translationButton =
+        addToolButton(toolsWidget, translationTool, "Move Camera View");
+    paintButton = addToolButton(toolsWidget, paintTool, "'B'rush: Paint Rings");
+
     // Brightness slider widget
     new Label(palette, "Brightness Slider", "sans-bold");
     Slider *brightness = new Slider(palette);
@@ -111,14 +84,15 @@ MailleScreen::MailleScreen()
     // Initialize color picker tool and button
     colorPickerTool =
         std::make_shared<ColorPickerTool>(ENTYPO_ICON_DROP, wheel);
-    b = new Button(toolsWidget, "", colorPickerTool->getIcon());
-    b->setFlags(Button::RadioButton);
-    b->setTooltip("Select Color Based on Existing Ring");
-    b->setCallback([this]() {
-        mCanvas->setTool(colorPickerTool);
-        curTool = colorPickerTool;
-    });
-    toolButtons.push_back(b);
+    colorPickerButton =
+        addToolButton(toolsWidget, colorPickerTool, "'C'olor Picker");
+
+    // put tool buttons in same radio button group
+    adderButton->setButtonGroup(toolButtons);
+    selectionButton->setButtonGroup(toolButtons);
+    translationButton->setButtonGroup(toolButtons);
+    paintButton->setButtonGroup(toolButtons);
+    colorPickerButton->setButtonGroup(toolButtons);
 
     // Tool specific buttons
     new Label(palette, "Tool operations", "sans-bold");
@@ -181,6 +155,56 @@ bool MailleScreen::resizeEvent(const Eigen::Vector2i &size)
     auto position = mCanvas->position();
     mCanvas->resize({size(0) - position(0), size(1)});
     return true;
+}
+
+bool MailleScreen::keyboardEvent(int key, int scancode, int action,
+                                 int modifiers)
+{
+    if (mCanvas->keyboardEvent(key, scancode, action, modifiers))
+        return true;
+
+    bool ret = false;
+
+    if (key == GLFW_KEY_A && action)
+        ret = simulateButtonClick(adderButton);
+    else if (key == GLFW_KEY_S && action)
+        ret = simulateButtonClick(selectionButton);
+    else if (key == GLFW_KEY_B && action)
+        ret = simulateButtonClick(paintButton);
+    else if (key == GLFW_KEY_C && action)
+        ret = simulateButtonClick(colorPickerButton);
+
+    return ret;
+}
+
+bool MailleScreen::simulateButtonClick(nanogui::Button *b)
+{
+    auto siblings = b->buttonGroup();
+    b->callback()();
+    for (auto &s : siblings)
+        s->setPushed(false);
+    b->setPushed(true);
+
+    return true;
+}
+
+void MailleScreen::setTool(std::shared_ptr<Tool> tool)
+{
+    mCanvas->setTool(tool);
+    curTool = tool;
+}
+
+nanogui::Button *MailleScreen::addToolButton(nanogui::Widget *parent,
+                                             std::shared_ptr<Tool> tool,
+                                             const std::string &tooltip)
+{
+    nanogui::Button *b = new nanogui::Button(parent, "", tool->getIcon());
+    b->setFlags(nanogui::Button::RadioButton);
+    b->setTooltip(tooltip);
+    b->setCallback([this, tool]() { setTool(tool); });
+    toolButtons.push_back(b);
+
+    return b;
 }
 
 void MailleScreen::exportColorReport() const
@@ -265,7 +289,7 @@ void MailleScreen::loadFile()
 
     for (const auto &b : toolButtons)
         b->setPushed(false);
-    toolButtons[2]->setPushed(true);
+    translationButton->setPushed(true);
     curTool = translationTool;
     mCanvas->resetState(curTool);
     if (!weaveManager->importSaveFile(design, *inlay))

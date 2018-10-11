@@ -20,8 +20,15 @@ public:
     MailleScreen();
 
     bool resizeEvent(const Eigen::Vector2i &size) override;
+    bool keyboardEvent(int key, int scancode, int action,
+                       int modifiers) override;
 
 private:
+    bool simulateButtonClick(nanogui::Button *b);
+    void setTool(std::shared_ptr<Tool> tool);
+    nanogui::Button *addToolButton(nanogui::Widget *parent,
+                                   std::shared_ptr<Tool> tool,
+                                   const std::string &tooltip);
     void exportColorReport() const;
     void saveFile() const;
     void loadFile();
@@ -40,6 +47,12 @@ private:
     std::shared_ptr<TranslationTool> translationTool;
     std::shared_ptr<PaintTool> paintTool;
     std::shared_ptr<Tool> curTool;
+    // Tool buttons
+    nanogui::Button *colorPickerButton;
+    nanogui::Button *adderButton;
+    nanogui::Button *selectionButton;
+    nanogui::Button *translationButton;
+    nanogui::Button *paintButton;
     // Global foreground color
     std::shared_ptr<Maille::Color> fgcolor;
 };
