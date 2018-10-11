@@ -17,21 +17,19 @@ public:
     void resetState(std::shared_ptr<Tool> tool);
     void applyViewTransformation(Eigen::Matrix4f transform);
     void setTool(std::shared_ptr<Tool> t);
-    virtual bool mouseButtonEvent(const Eigen::Vector2i &p, int button,
-                                  bool down, int modifiers) override;
-    virtual bool mouseMotionEvent(const Eigen::Vector2i &p,
-                                  const Eigen::Vector2i &rel, int button,
-                                  int modifiers) override;
-    virtual bool mouseDragEvent(const Eigen::Vector2i &p,
-                                const Eigen::Vector2i &rel, int button,
-                                int modifiers) override;
-    virtual bool keyboardEvent(int key, int scancode, int action,
-                               int modifiers) override;
-    virtual bool scrollEvent(const Eigen::Vector2i &p,
-                             const Eigen::Vector2f &rel) override;
+    bool mouseButtonEvent(const Eigen::Vector2i &p, int button, bool down,
+                          int modifiers) override;
+    bool mouseMotionEvent(const Eigen::Vector2i &p, const Eigen::Vector2i &rel,
+                          int button, int modifiers) override;
+    bool mouseDragEvent(const Eigen::Vector2i &p, const Eigen::Vector2i &rel,
+                        int button, int modifiers) override;
+    bool keyboardEvent(int key, int scancode, int action,
+                       int modifiers) override;
+    bool scrollEvent(const Eigen::Vector2i &p,
+                     const Eigen::Vector2f &rel) override;
     void resize(const Eigen::Vector2i &size);
 
-    virtual void drawGL() override;
+    void drawGL() override;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
