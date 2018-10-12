@@ -22,11 +22,29 @@ bool TranslationTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
     return true;
 }
 
+bool TranslationTool::mouseMotionEvent(const Eigen::Vector2i &p,
+                                       const Eigen::Vector2i &rel, int button,
+                                       int modifiers,
+                                       const Eigen::Vector2f &worldPos,
+                                       MailleInlay &inlay)
+{
+    return motionEvent(p, rel, button, modifiers, worldPos, inlay);
+}
+
 bool TranslationTool::mouseDragEvent(const Eigen::Vector2i &p,
                                      const Eigen::Vector2i &rel, int button,
                                      int modifiers,
                                      const Eigen::Vector2f &worldPos,
                                      MailleInlay &inlay)
+{
+    return motionEvent(p, rel, button, modifiers, worldPos, inlay);
+}
+
+bool TranslationTool::motionEvent(const Eigen::Vector2i &p,
+                                  const Eigen::Vector2i &rel, int button,
+                                  int modifiers,
+                                  const Eigen::Vector2f &worldPos,
+                                  MailleInlay &inlay)
 {
     inlay.transformation(0, 3) = worldPos(0) - dragBeginWorld(0);
     inlay.transformation(1, 3) = worldPos(1) - dragBeginWorld(1);

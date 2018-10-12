@@ -6,12 +6,14 @@
 #include "mailleinlay.h"
 
 class Tool;
+class TranslationTool;
 
 class RingGLCanvas : public nanogui::GLCanvas
 {
 public:
     RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
-                 std::shared_ptr<Tool> tool);
+                 std::shared_ptr<Tool> tool,
+                 std::shared_ptr<TranslationTool> translate);
     ~RingGLCanvas() { mShader.free(); }
 
     void resetState(std::shared_ptr<Tool> tool);
@@ -49,4 +51,6 @@ private:
     std::shared_ptr<MailleInlay> inlay;
     // currently selected tool
     std::shared_ptr<Tool> tool;
+    // use translation tool for middle click + drag
+    std::shared_ptr<TranslationTool> translate;
 };

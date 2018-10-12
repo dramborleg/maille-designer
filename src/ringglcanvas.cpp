@@ -2,11 +2,14 @@
 
 #include "ringglcanvas.h"
 #include "tools/tool.h"
+#include "tools/translationtool.h"
 
 RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
-                           std::shared_ptr<Tool> tool)
+                           std::shared_ptr<Tool> tool,
+                           std::shared_ptr<TranslationTool> translate)
     : nanogui::GLCanvas(parent)
-    , inlay(std::move(inlay))
+    , inlay(inlay)
+    , translate(translate)
 {
     mShader.init(
         /* An identifying name */
@@ -61,7 +64,7 @@ RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
     this->inlay->mvp.setIdentity();
     this->inlay->transformation.setIdentity();
     setZoom();
-    setTool(std::move(tool));
+    setTool(tool);
 }
 
 void RingGLCanvas::resetState(std::shared_ptr<Tool> tool)
@@ -120,13 +123,12 @@ bool RingGLCanvas::mouseButtonEvent(const Eigen::Vector2i &p, int button,
 {
     requestFocus();
 
-    if (tool)
-    {
-        Eigen::Vector2f pos = canvasToWorld(p);
-        return tool->mouseButtonEvent(p, button, down, modifiers, pos, *inlay);
-    }
+    Eigen::Vector2f pos = canvasToWorld(p);
+    if (button == 2)
+        return translate->mouseButtonEvent(p, button, down, modifiers, pos,
+                                           *inlay);
 
-    return true;
+    return tool->mouseButtonEvent(p, button, down, modifiers, pos, *inlay);
 }
 
 bool RingGLCanvas::mouseMotionEvent(const Eigen::Vector2i &p,
@@ -135,20 +137,31 @@ bool RingGLCanvas::mouseMotionEvent(const Eigen::Vector2i &p,
 {
     requestFocus();
 
-    return true;
+    Eigen::Vector2f pos = canvasToWorld(p);
+    // This else statement is very hacky, but unfortunately it seems that
+    // nanogui isn't passing a button event when the scroll wheel button (2) is
+    // released if it is released outside of the nanogui window dimensions. This
+    // causes the transformation in the inlay struct to not be applied to the
+    // mvp, and then results in the inlay "jumping" around to places you
+    // wouldn't expect it to be. The best solution for the time being seems to
+    // be that if the scroll wheel isn't pressed during a mouse motion event
+    // (button != 4), send a button event with pressed = false so that the
+    // previous transformation is applied to the mvp, and then future motion
+    // events don't find the inlay jumping around.
+    if (button == 4)
+        return translate->mouseMotionEvent(p, rel, button, modifiers, pos,
+                                           *inlay);
+
+    return translate->mouseButtonEvent(p, button, false, modifiers, pos,
+                                       *inlay);
 }
 
 bool RingGLCanvas::mouseDragEvent(const Eigen::Vector2i &p,
                                   const Eigen::Vector2i &rel, int button,
                                   int modifiers)
 {
-    if (tool)
-    {
-        Eigen::Vector2f pos = canvasToWorld(p);
-        return tool->mouseDragEvent(p, rel, button, modifiers, pos, *inlay);
-    }
-
-    return true;
+    Eigen::Vector2f pos = canvasToWorld(p);
+    return tool->mouseDragEvent(p, rel, button, modifiers, pos, *inlay);
 }
 
 bool RingGLCanvas::keyboardEvent(int key, int scancode, int action,

@@ -43,7 +43,7 @@ MailleScreen::MailleScreen()
     curTool = adderTool;
 
     // Ring Canvas
-    mCanvas = new RingGLCanvas(this, inlay, curTool);
+    mCanvas = new RingGLCanvas(this, inlay, curTool, translationTool);
     mCanvas->setPosition(Vector2i(200, 0));
     mCanvas->setBackgroundColor({100, 100, 100, 255});
     mCanvas->resize({600, 600});
