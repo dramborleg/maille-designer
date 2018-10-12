@@ -63,7 +63,7 @@ MailleScreen::MailleScreen()
     selectionButton =
         addToolButton(toolsWidget, selectionTool, "'S'elect Rings");
     translationButton =
-        addToolButton(toolsWidget, translationTool, "Move Camera View");
+        addToolButton(toolsWidget, translationTool, "'M'ove Camera View");
     paintButton = addToolButton(toolsWidget, paintTool, "'B'rush: Paint Rings");
 
     // Brightness slider widget
@@ -173,6 +173,8 @@ bool MailleScreen::keyboardEvent(int key, int scancode, int action,
         ret = simulateButtonClick(paintButton);
     else if (key == GLFW_KEY_C && action)
         ret = simulateButtonClick(colorPickerButton);
+    else if (key == GLFW_KEY_M && action)
+        ret = simulateButtonClick(translationButton);
 
     return ret;
 }
