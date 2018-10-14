@@ -89,7 +89,7 @@ void Torus::set_center(float x, float y)
     compute_points();
 }
 
-void Torus::set_rotation(nanogui::Matrix4f rotation)
+void Torus::set_rotation(const nanogui::Matrix4f &rotation)
 {
     this->rotation = rotation;
 

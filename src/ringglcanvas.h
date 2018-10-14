@@ -17,7 +17,7 @@ public:
     ~RingGLCanvas() { mShader.free(); }
 
     void resetState(std::shared_ptr<Tool> tool);
-    void applyViewTransformation(Eigen::Matrix4f transform);
+    void applyViewTransformation(const Eigen::Matrix4f &transform);
     void setTool(std::shared_ptr<Tool> t);
     bool mouseButtonEvent(const Eigen::Vector2i &p, int button, bool down,
                           int modifiers) override;

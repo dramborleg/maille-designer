@@ -18,7 +18,7 @@ public:
     unsigned get_num_samples_radius() const { return nTheta; }
     unsigned get_num_samples_cross_section() const { return nAlpha; }
     bool get_selected() const { return selected; }
-    void set_rotation(nanogui::Matrix4f rotation);
+    void set_rotation(const nanogui::Matrix4f &rotation);
     void set_center(float x, float y);
     void set_color(const Maille::Color &color) { this->color = color; }
     void set_selected(bool sel) { selected = sel; }

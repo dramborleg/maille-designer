@@ -240,7 +240,7 @@ void RingGLCanvas::drawGL()
     glDisable(GL_DEPTH_TEST);
 }
 
-void RingGLCanvas::applyViewTransformation(Eigen::Matrix4f transform)
+void RingGLCanvas::applyViewTransformation(const Eigen::Matrix4f &transform)
 {
     inlay->mvp *= transform;
 }
