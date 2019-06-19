@@ -89,24 +89,8 @@ void European4in1::addRingsInArea(const Eigen::Vector2f &begin,
     yBeginOdd = (minIdxY % 2) ? minIdxY : (minIdxY + 1);
 
     for (int x = minIdxX; x <= maxIdxX; x++)
-    {
         for (int y = (x % 2) ? yBeginOdd : yBeginEven; y <= maxIdxY; y += 2)
-        {
-            auto idx = std::make_pair(x, y);
-            if (rings.find(idx) == rings.end())
-            {
-                auto t = std::make_shared<Torus>(color);
-                t->set_center(idx.first * xDist, idx.second * yDist);
-                t->set_rotation(x % 2 ? rot1 : rot0);
-
-                rings[idx] = t;
-                inlay.rings.push_back(t);
-                inlay.ringsModified = true;
-            }
-        }
-    }
-
-    return;
+            addRingByIndex(std::make_pair(x, y), color, inlay);
 }
 
 void European4in1::deleteRing(const Eigen::Vector2f &worldClickLoc,
