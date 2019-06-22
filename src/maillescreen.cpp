@@ -282,10 +282,6 @@ void MailleScreen::loadFile()
     adderTool->setWeaveManager(weaveManager);
     selectionTool->setWeaveManager(weaveManager);
 
-    for (const auto &b : toolButtons)
-        b->setPushed(false);
-    translationButton->setPushed(true);
-    curTool = translationTool;
-    mCanvas->resetState(curTool);
+    mCanvas->resetState();
     weaveManager->importSaveFile(this, design, *inlay);
 }

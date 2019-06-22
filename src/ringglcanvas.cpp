@@ -67,7 +67,7 @@ RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
     setTool(tool);
 }
 
-void RingGLCanvas::resetState(std::shared_ptr<Tool> tool)
+void RingGLCanvas::resetState()
 {
     inlay->rings.clear();
     inlay->ringsModified = true;
@@ -76,7 +76,6 @@ void RingGLCanvas::resetState(std::shared_ptr<Tool> tool)
 
     zoom = 8.0;
     resize(size());
-    setTool(std::move(tool));
 }
 
 void RingGLCanvas::uploadRingData()
