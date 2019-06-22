@@ -38,6 +38,8 @@ private:
     std::vector<nanogui::Button *> toolButtons;
     // weave manager used by certain tools as well as for creating save files
     std::shared_ptr<Weave> weaveManager;
+    // weave settings window used by weaveManager
+    nanogui::Window *weaveSettings = nullptr;
     // Global inlay state
     std::shared_ptr<MailleInlay> inlay;
     // Tools

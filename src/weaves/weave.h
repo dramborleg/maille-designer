@@ -22,6 +22,7 @@ public:
                             MailleInlay &inlay) = 0;
     virtual std::shared_ptr<cpptoml::table>
         generateSaveFile(const MailleInlay &inlay) const = 0;
-    virtual bool importSaveFile(std::shared_ptr<cpptoml::table> design,
+    virtual void importSaveFile(nanogui::Widget *parent,
+                                std::shared_ptr<cpptoml::table> design,
                                 MailleInlay &inlay) = 0;
 };

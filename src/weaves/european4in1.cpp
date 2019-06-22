@@ -3,27 +3,53 @@
 #include <cpptoml.h>
 #include <stdexcept>
 
+#include <nanogui/checkbox.h>
+#include <nanogui/layout.h>
+#include <nanogui/messagedialog.h>
+#include <nanogui/window.h>
+
 #include "common.h"
 #include "european4in1.h"
 
 const std::string European4in1::weaveID = "European 4 in 1";
-const int European4in1::VERSION = 0;
+const int European4in1::VERSION = 1;
 
-European4in1::European4in1()
+European4in1::European4in1(nanogui::Window *weaveSettings,
+                           std::shared_ptr<MailleInlay> inlay)
 {
+    using namespace nanogui;
+
     theta = atan(1.5 * thickness / radius);
     xDist = 1.85 * radius - 2 * thickness;
     yDist = radius - thickness;
     // clang-format off
-    rot0 << 1.0, 0.0, 0.0, 0.0,
-            0.0, cos(theta), -sin(theta), 0.0,
-            0.0, sin(theta), cos(theta), 0.0,
-            0.0, 0.0, 0.0, 1.0;
-    rot1 << 1.0, 0.0, 0.0, 0.0,
-            0.0, cos(-theta), -sin(-theta), 0.0,
-            0.0, sin(-theta), cos(-theta), 0.0,
-            0.0, 0.0, 0.0, 1.0;
+    rot0WrongWay << 1.0, 0.0,        0.0,         0.0,
+                    0.0, cos(theta), -sin(theta), 0.0,
+                    0.0, sin(theta), cos(theta),  0.0,
+                    0.0, 0.0,        0.0,         1.0;
+    rot1WrongWay << 1.0, 0.0,         0.0,          0.0,
+                    0.0, cos(-theta), -sin(-theta), 0.0,
+                    0.0, sin(-theta), cos(-theta),  0.0,
+                    0.0, 0.0,         0.0,          1.0;
+    rot0RightWay << cos(theta), 0.0, -sin(theta), 0.0,
+                    0.0,        1.0, 0.0,         0.0,
+                    sin(theta), 0.0, cos(theta),  0.0,
+                    0.0,        0.0, 0.0,         1.0;
+    rot1RightWay << cos(-theta), 0.0, -sin(-theta), 0.0,
+                    0.0,         1.0, 0.0,          0.0,
+                    sin(-theta), 0.0, cos(-theta),  0.0,
+                    0.0,         0.0, 0.0,          1.0;
     // clang-format on
+
+    weaveSettings->setLayout(new GroupLayout());
+
+    wrongWay = new CheckBox(weaveSettings, "Wrong Way");
+    wrongWay->setChecked(true);
+    wrongWay->setCallback([this, inlay](bool val) { swapWay(*inlay); });
+
+    rotateInlay = new CheckBox(weaveSettings, "Rotate Inlay            ");
+    rotateInlay->setTooltip("Whether or not to rotate inlay design when "
+                            "switching between wrong way and right way");
 }
 
 void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
@@ -79,11 +105,13 @@ void European4in1::addRingsInArea(const Eigen::Vector2f &begin,
 {
     int minIdxX, minIdxY, maxIdxX, maxIdxY;
     int yBeginEven, yBeginOdd;
+    float xDiv = wrongWay->checked() ? xDist : yDist;
+    float yDiv = wrongWay->checked() ? yDist : xDist;
 
-    minIdxX = std::min(begin(0), end(0)) / xDist;
-    minIdxY = std::min(begin(1), end(1)) / yDist;
-    maxIdxX = std::max(begin(0), end(0)) / xDist;
-    maxIdxY = std::max(begin(1), end(1)) / yDist;
+    minIdxX = std::min(begin(0), end(0)) / xDiv;
+    minIdxY = std::min(begin(1), end(1)) / yDiv;
+    maxIdxX = std::max(begin(0), end(0)) / xDiv;
+    maxIdxY = std::max(begin(1), end(1)) / yDiv;
 
     yBeginEven = (minIdxY % 2) ? (minIdxY + 1) : minIdxY;
     yBeginOdd = (minIdxY % 2) ? minIdxY : (minIdxY + 1);
@@ -144,26 +172,49 @@ std::shared_ptr<cpptoml::table>
 
     root->insert("WeaveID", weaveID);
     root->insert("Version", VERSION);
+    root->insert("WrongWay", wrongWay->checked());
     root->insert("Indices", indices);
     root->insert("Colors", colors);
 
     return root;
 }
 
-bool European4in1::importSaveFile(std::shared_ptr<cpptoml::table> design,
+void European4in1::importSaveFile(nanogui::Widget *parent,
+                                  std::shared_ptr<cpptoml::table> design,
                                   MailleInlay &inlay)
 {
+    size_t max;
     bool success = true;
     auto indices = design->get_array_of<cpptoml::array>("Indices");
     auto colors = design->get_array_of<cpptoml::array>("Colors");
+    auto wrongWay = design->get_as<bool>("WrongWay");
 
     if (!indices || !colors)
-        return false;
+    {
+        success = false;
+        goto out;
+    }
 
     if (indices->size() != colors->size())
         success = false;
 
-    size_t max = std::min(indices->size(), colors->size());
+    if (!wrongWay)
+    {
+        new nanogui::MessageDialog(
+            parent, nanogui::MessageDialog::Type::Information,
+            "Import Information",
+            "It seems this save file is from an older version of Maille Inlay "
+            "Designer. If you designed this file while using a rotated view so "
+            "that it looked like the Right Way, please check the \"Rotate "
+            "Inlay\" checkbox and afterwards uncheck the Wrong Way checkbox to "
+            "get your old configuration, then resave the file so in the future "
+            "it will load the Right Way by default.");
+        this->wrongWay->setChecked(true);
+    }
+    else
+        this->wrongWay->setChecked(*wrongWay);
+
+    max = std::min(indices->size(), colors->size());
     for (size_t i = 0; i < max; i++)
     {
         auto idx = (*indices)[i]->get_array_of<int64_t>();
@@ -181,7 +232,11 @@ bool European4in1::importSaveFile(std::shared_ptr<cpptoml::table> design,
             success = false;
     }
 
-    return success;
+out:
+    if (!success)
+        new nanogui::MessageDialog(
+            parent, nanogui::MessageDialog::Type::Warning, "Import Error",
+            "Error while importing design file. Possible file corruption.");
 }
 
 std::pair<int, int> European4in1::nearestRing(const Eigen::Vector2f &loc)
@@ -215,11 +270,59 @@ bool European4in1::addRingByIndex(const std::pair<int, int> &index,
         return false;
 
     auto t = std::make_shared<Torus>(color);
-    t->set_center(index.first * xDist, index.second * yDist);
-    t->set_rotation(index.first % 2 ? rot1 : rot0);
+    std::pair<float, float> center = idxToPos(index);
+    t->set_center(center.first, center.second);
+    t->set_rotation(idxToRot(index));
     rings[index] = t;
     inlay.rings.push_back(t);
     inlay.ringsModified = true;
 
     return true;
+}
+
+const Eigen::Matrix4f &
+    European4in1::idxToRot(const std::pair<int, int> &idx) const
+{
+    if (wrongWay->checked())
+        return idx.first % 2 ? rot1WrongWay : rot0WrongWay;
+
+    return idx.second % 2 ? rot1RightWay : rot0RightWay;
+}
+
+std::pair<float, float>
+    European4in1::idxToPos(const std::pair<int, int> &idx) const
+{
+    if (wrongWay->checked())
+        return std::make_pair(idx.first * xDist, idx.second * yDist);
+
+    return std::make_pair(idx.first * yDist, idx.second * xDist);
+}
+
+void European4in1::swapWay(MailleInlay &inlay)
+{
+    if (rings.empty())
+        return;
+
+    if (rotateInlay->checked())
+    {
+        std::map<std::pair<int, int>, std::shared_ptr<Torus>> rotRings;
+        for (const auto &r : rings)
+        {
+            std::pair<int, int> idx = r.first;
+            std::swap(idx.first, idx.second);
+            idx.second = -idx.second;
+            rotRings[idx] = r.second;
+        }
+
+        rotRings.swap(rings);
+    }
+
+    for (auto &r : rings)
+    {
+        std::pair<float, float> center = idxToPos(r.first);
+        r.second->set_center(center.first, center.second);
+        r.second->set_rotation(idxToRot(r.first));
+    }
+
+    inlay.ringsModified = true;
 }

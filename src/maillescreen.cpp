@@ -21,7 +21,7 @@
 #include "weaves/european4in1.h"
 
 MailleScreen::MailleScreen()
-    : nanogui::Screen(Eigen::Vector2i(800, 600), "Maille Designer", true)
+    : nanogui::Screen(Eigen::Vector2i(1200, 900), "Maille Designer", true)
 {
     using namespace nanogui;
 
@@ -33,7 +33,8 @@ MailleScreen::MailleScreen()
     fgcolor = std::make_shared<Maille::Color>(255, 0, 0);
 
     // Initialize selection and adder tools
-    weaveManager = std::make_shared<European4in1>();
+    weaveSettings = new Window(this, "Weave Settings");
+    weaveManager = std::make_shared<European4in1>(weaveSettings, inlay);
     adderTool =
         std::make_shared<WeaveAddTool>(ENTYPO_ICON_PLUS, weaveManager, fgcolor);
     selectionTool = std::make_shared<SelectionTool>(ENTYPO_ICON_MOUSE_POINTER,
@@ -46,7 +47,7 @@ MailleScreen::MailleScreen()
     mCanvas = new RingGLCanvas(this, inlay, curTool, translationTool);
     mCanvas->setPosition(Vector2i(200, 0));
     mCanvas->setBackgroundColor({100, 100, 100, 255});
-    mCanvas->resize({600, 600});
+    mCanvas->resize({width() - 200, height()});
 
     // Tool Palette and Widget Window
     Window *palette = new Window(this, "Tools");
@@ -148,6 +149,7 @@ MailleScreen::MailleScreen()
     loadFileButton->setCallback([this]() { loadFile(); });
 
     performLayout();
+    weaveSettings->setPosition(Vector2i(0, palette->height() + 10));
 }
 
 bool MailleScreen::resizeEvent(const Eigen::Vector2i &size)
@@ -285,7 +287,18 @@ void MailleScreen::loadFile()
         return;
     }
 
-    weaveManager = std::make_shared<European4in1>();
+    // If we call performLayout() in this class twice, then for some reason the
+    // tools palette gets wider after the 2nd call (but not after the third
+    // call). To prevent this happening, we try to avoid calling performLayout
+    // here while still giving the opportunity to reset the weaveSettings
+    // elements, which we do by deleting all children of weaveSettings, letting
+    // the weave add its new elements, and then calling performLayout
+    // specifically on weaveSettings (rather than on this).
+    int nChildren = weaveSettings->childCount();
+    for (int i = 0; i < nChildren; i++)
+        weaveSettings->removeChild(0);
+    weaveManager = std::make_shared<European4in1>(weaveSettings, inlay);
+    weaveSettings->performLayout(this->nvgContext());
     adderTool->setWeaveManager(weaveManager);
     selectionTool->setWeaveManager(weaveManager);
 
@@ -294,8 +307,5 @@ void MailleScreen::loadFile()
     translationButton->setPushed(true);
     curTool = translationTool;
     mCanvas->resetState(curTool);
-    if (!weaveManager->importSaveFile(design, *inlay))
-        new nanogui::MessageDialog(
-            this, nanogui::MessageDialog::Type::Warning, "Import Error",
-            "Error while importing design file. Possible file corruption.");
+    weaveManager->importSaveFile(this, design, *inlay);
 }
