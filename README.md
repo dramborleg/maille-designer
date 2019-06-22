@@ -11,10 +11,6 @@ The color report writes a text file which contains the rgb values of each of the
 
 What this means for users is that using the color wheel to select colors is only recommended for introducing new colors to the design. If a ring already exists with the color you want to use, you should use the color select tool to set the current color so that new rings have exactly the same color as the existing rings. This will create a more coherent color report.
 
-## Known Bugs
-
-If you rotate the design and then resize the program window, the projection will become squashed and rotated (among other things). I'd suggest not doing this. If you do it by accident, save your work and then reload the file (or restart the program). Maybe I'll get around to fixing this eventually if I get very motivated, but for now it's not a big enough deal for me to make time to fix it.
-
 ## Compiling
 
 You'll need cmake version 3.5 or greater, a C++14 compiler, and all the necessary libraries for nanogui.
