@@ -187,17 +187,10 @@ nanogui::Button *MailleScreen::addToolButton(nanogui::Widget *parent,
     return b;
 }
 
-void MailleScreen::exportColorReport() const
+std::unordered_map<Maille::Color, unsigned, Maille::ColorHash>
+    MailleScreen::getColorReport() const
 {
     std::unordered_map<Maille::Color, unsigned, Maille::ColorHash> hist;
-    std::string report;
-    std::string fpath = nanogui::file_dialog({{"txt", "Textfile"}}, true);
-
-    if (fpath == "")
-        return;
-
-    if (fpath.size() < 4 || fpath.substr(fpath.size() - 4, 4) != ".txt")
-        fpath += ".txt";
 
     for (const std::shared_ptr<Torus> &ring : inlay->rings)
     {
@@ -208,15 +201,78 @@ void MailleScreen::exportColorReport() const
             hist[c] = 1;
     }
 
-    report = "r, g, b: count";
-    for (auto i = hist.begin(); i != hist.end(); i++)
-        report += "\n" + std::to_string(i->first(0)) + ", " +
-                  std::to_string(i->first(1)) + ", " +
-                  std::to_string(i->first(2)) + ": " +
-                  std::to_string(i->second);
+    return hist;
+}
 
-    std::ofstream f(fpath);
-    f.write(report.data(), report.size());
+void MailleScreen::exportColorReport()
+{
+    using namespace nanogui;
+
+    auto hist = getColorReport();
+    std::string report = "r, g, b: count";
+    // Cap max number of colors which can (somewhat) be displayed on a 1200x900
+    // screen. This means ~24 rows and ~16 color columns, and 16 color columns
+    // would be equivalent to 32 color + textbox columns
+    int maxRows = 24;
+    int maxCols = 16 * 2;
+    int ncols = 2 + 2 * (hist.size() / maxRows);
+    int maxEntries = maxRows * maxCols / 2;
+    bool overflow = false;
+
+    if (ncols > maxCols)
+    {
+        overflow = true;
+        ncols = maxCols;
+    }
+
+    Window *reportWin = new Window(this, "Color Report");
+    GridLayout *layout =
+        new GridLayout(Orientation::Horizontal, ncols, Alignment::Middle, 10);
+    layout->setColAlignment({Alignment::Fill, Alignment::Fill});
+    reportWin->setLayout(layout);
+    int numEntries = 0;
+    unsigned char r, g, bl;
+    for (auto i = hist.begin(); i != hist.end(); i++)
+    {
+        r = i->first(0);
+        g = i->first(1);
+        bl = i->first(2);
+        numEntries++;
+
+        report += "\n" + std::to_string(r) + ", " + std::to_string(g) + ", " +
+                  std::to_string(bl) + ": " + std::to_string(i->second);
+
+        if (overflow && numEntries > maxEntries)
+            continue;
+
+        Button *b = new Button(reportWin, "");
+        b->setBackgroundColor(Color(Eigen::Vector3i(r, g, bl)));
+        new TextBox(reportWin, std::to_string(i->second));
+    }
+
+    Button *b = new Button(reportWin, "close");
+    b->setCallback([reportWin] { reportWin->dispose(); });
+
+    b = new Button(reportWin, "save txt");
+    std::function<void()> exportText = [reportWin, report]() {
+        std::string fpath = nanogui::file_dialog({{"txt", "Textfile"}}, true);
+
+        if (fpath == "")
+        {
+            reportWin->dispose();
+            return;
+        }
+
+        if (fpath.size() < 4 || fpath.substr(fpath.size() - 4, 4) != ".txt")
+            fpath += ".txt";
+
+        std::ofstream f(fpath);
+        f.write(report.data(), report.size());
+        reportWin->dispose();
+    };
+    b->setCallback(exportText);
+
+    reportWin->center();
 }
 
 void MailleScreen::saveFile() const

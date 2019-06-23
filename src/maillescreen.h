@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_map>
+
 #include <nanogui/screen.h>
 
 #include "common.h"
@@ -29,7 +31,8 @@ private:
     nanogui::Button *addToolButton(nanogui::Widget *parent,
                                    std::shared_ptr<Tool> tool,
                                    const std::string &tooltip);
-    void exportColorReport() const;
+    std::unordered_map<Maille::Color, unsigned, Maille::ColorHash> getColorReport() const;
+    void exportColorReport();
     void saveFile() const;
     void loadFile();
 
