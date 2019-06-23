@@ -145,31 +145,27 @@ bool MailleScreen::keyboardEvent(int key, int scancode, int action,
     if (mCanvas->keyboardEvent(key, scancode, action, modifiers))
         return true;
 
-    bool ret = false;
-
     if (key == GLFW_KEY_A && action)
-        ret = simulateButtonClick(adderButton);
+        simulateButtonClick(adderButton);
     else if (key == GLFW_KEY_S && action)
-        ret = simulateButtonClick(selectionButton);
+        simulateButtonClick(selectionButton);
     else if (key == GLFW_KEY_B && action)
-        ret = simulateButtonClick(paintButton);
+        simulateButtonClick(paintButton);
     else if (key == GLFW_KEY_C && action)
-        ret = simulateButtonClick(colorPickerButton);
+        simulateButtonClick(colorPickerButton);
     else if (key == GLFW_KEY_M && action)
-        ret = simulateButtonClick(translationButton);
+        simulateButtonClick(translationButton);
 
-    return ret;
+    return Screen::keyboardEvent(key, scancode, action, modifiers);
 }
 
-bool MailleScreen::simulateButtonClick(nanogui::Button *b)
+void MailleScreen::simulateButtonClick(nanogui::Button *b)
 {
     auto siblings = b->buttonGroup();
     b->callback()();
     for (auto &s : siblings)
         s->setPushed(false);
     b->setPushed(true);
-
-    return true;
 }
 
 void MailleScreen::setTool(std::shared_ptr<Tool> tool)

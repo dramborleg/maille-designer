@@ -24,7 +24,7 @@ public:
                        int modifiers) override;
 
 private:
-    bool simulateButtonClick(nanogui::Button *b);
+    void simulateButtonClick(nanogui::Button *b);
     void setTool(std::shared_ptr<Tool> tool);
     nanogui::Button *addToolButton(nanogui::Widget *parent,
                                    std::shared_ptr<Tool> tool,
