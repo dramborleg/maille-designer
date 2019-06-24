@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 include_directories(ext/nanogui/include)
 include_directories(ext/cpptoml/include)
+include_directories(ext/stb_image)
 
 # Compiler specific settings
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")

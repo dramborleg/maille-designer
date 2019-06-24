@@ -25,4 +25,8 @@ public:
     virtual void importSaveFile(nanogui::Widget *parent,
                                 std::shared_ptr<cpptoml::table> design,
                                 MailleInlay &inlay) = 0;
+    virtual void importImage(nanogui::Widget *parent, std::string fpath,
+                             MailleInlay &inlay)
+    {
+    }
 };

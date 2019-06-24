@@ -8,6 +8,9 @@
 #include <nanogui/messagedialog.h>
 #include <nanogui/window.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #include "common.h"
 #include "european4in1.h"
 
@@ -237,6 +240,36 @@ out:
         new nanogui::MessageDialog(
             parent, nanogui::MessageDialog::Type::Warning, "Import Error",
             "Error while importing design file. Possible file corruption.");
+}
+
+void European4in1::importImage(nanogui::Widget *parent, std::string fpath,
+                               MailleInlay &inlay)
+{
+    int xdim, ydim, nchan;
+    unsigned char *img = stbi_load(fpath.c_str(), &xdim, &ydim, &nchan, 3);
+    if (img == nullptr)
+    {
+        std::string error_msg = "failed to allocate memory for image";
+        new nanogui::MessageDialog(parent,
+                                   nanogui::MessageDialog::Type::Warning,
+                                   "Import from Image Error", error_msg);
+        return;
+    }
+
+    inlay.rings.clear();
+    rings.clear();
+
+    for (int x = 0; x < xdim; x++)
+    {
+        for (int y = 0; y < ydim; y++)
+        {
+            int idx = nchan * y * xdim + nchan * x;
+            Maille::Color c(img[idx], img[idx + 1], img[idx + 2]);
+            int xIdx = y % 2 ? 2 * x : 2 * x - 1;
+            int yIdx = ydim - y;
+            addRingByIndex({xIdx, yIdx}, c, inlay);
+        }
+    }
 }
 
 std::pair<int, int> European4in1::nearestRing(const Eigen::Vector2f &loc)

@@ -153,6 +153,11 @@ MailleScreen::MailleScreen()
     colorReport->setTooltip("Export Ring Color Counts");
     colorReport->setCallback([this]() { exportColorReport(); });
 
+    // import image button
+    Button *importImageButton = new Button(palette, "Import Image", 0);
+    importImageButton->setTooltip("Create a design from an input image");
+    importImageButton->setCallback([this]() { importImage(); });
+
     // save file and load file buttons
     Button *saveFileButton = new Button(palette, "Save", ENTYPO_ICON_SAVE);
     saveFileButton->setCallback([this]() { saveFile(); });
@@ -305,6 +310,30 @@ void MailleScreen::exportColorReport()
     b->setCallback(exportText);
 
     reportWin->center();
+}
+
+void MailleScreen::importImage()
+{
+    std::string fpath = nanogui::file_dialog(
+        {{"jpg", "jpg"}, {"png", "png"}, {"gif", "gif"}, {"bmp", "bmp"}}, true);
+
+    if (fpath == "")
+        return;
+
+    if (!inlay->rings.empty())
+    {
+        auto dlg = new nanogui::MessageDialog(
+            this, nanogui::MessageDialog::Type::Question, "Import from Image",
+            "Importing from an image will overwrite any existing rings in the "
+            "design, continue import?",
+            "continue", "cancel", true);
+        dlg->setCallback([this, fpath](int cancel) {
+            if (!cancel)
+                weaveManager->importImage(this, fpath, *inlay);
+        });
+    }
+    else
+        weaveManager->importImage(this, fpath, *inlay);
 }
 
 void MailleScreen::saveFile() const

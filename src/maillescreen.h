@@ -36,6 +36,7 @@ private:
     std::unordered_map<Maille::Color, unsigned, Maille::ColorHash>
         getColorReport() const;
     void exportColorReport();
+    void importImage();
     void saveFile() const;
     void loadFile();
 

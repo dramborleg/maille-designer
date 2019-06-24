@@ -23,6 +23,8 @@ public:
     void importSaveFile(nanogui::Widget *parent,
                         std::shared_ptr<cpptoml::table> design,
                         MailleInlay &inlay) override;
+    void importImage(nanogui::Widget *parent, std::string fpath,
+                     MailleInlay &inlay) override;
     static std::string getWeaveID() { return weaveID; }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
