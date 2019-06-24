@@ -13,6 +13,7 @@
 #include "common.h"
 #include "maillescreen.h"
 #include "ringglcanvas.h"
+#include "nanogui/optionalpopupbutton.h"
 #include "tools/colorpickertool.h"
 #include "tools/painttool.h"
 #include "tools/selectiontool.h"
@@ -59,10 +60,32 @@ MailleScreen::MailleScreen()
     toolsWidget->setLayout(new GridLayout(Orientation::Horizontal, 4));
 
     // Tool buttons
+
+    // Add button
     adderButton = addToolButton(toolsWidget, adderTool, "'A'dd Rings");
     adderButton->setPushed(true);
+
+    // Selection button
     selectionButton =
         addToolButton(toolsWidget, selectionTool, "'S'elect Rings");
+    selectionButton->enablePopup(true);
+    Popup *sPopup = selectionButton->popup();
+    sPopup->setLayout(new GroupLayout());
+    // Selection tool delete button
+    Button *selectionToolDelete = new Button(sPopup, "", ENTYPO_ICON_TRASH);
+    selectionToolDelete->setTooltip("Delete Selection");
+    selectionToolDelete->setCallback([this]() {
+        if (curTool == selectionTool)
+            selectionTool->deleteSelection(*inlay);
+    });
+    Button *selectionToolColor = new Button(sPopup, "", ENTYPO_ICON_PALETTE);
+    selectionToolColor->setTooltip("Set Selection Color");
+    selectionToolColor->setCallback([this]() {
+        if (curTool == selectionTool)
+            selectionTool->setSelectionColor(*inlay, *fgcolor);
+    });
+
+    // translate and paint buttons
     translationButton =
         addToolButton(toolsWidget, translationTool, "'M'ove Camera View");
     paintButton = addToolButton(toolsWidget, paintTool, "'B'rush: Paint Rings");
@@ -94,28 +117,6 @@ MailleScreen::MailleScreen()
     translationButton->setButtonGroup(toolButtons);
     paintButton->setButtonGroup(toolButtons);
     colorPickerButton->setButtonGroup(toolButtons);
-
-    // Tool specific buttons
-    new Label(palette, "Tool operations", "sans-bold");
-    Widget *toolOperations = new Widget(palette);
-    toolOperations->setLayout(
-        new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 0));
-    // Selection tool delete button
-    Button *selectionToolDelete =
-        new Button(toolOperations, "", ENTYPO_ICON_TRASH);
-    selectionToolDelete->setTooltip("Delete Selection");
-    selectionToolDelete->setCallback([this]() {
-        if (curTool == selectionTool)
-            selectionTool->deleteSelection(*inlay);
-    });
-    // Selection tool set color button
-    Button *selectionToolColor =
-        new Button(toolOperations, "", ENTYPO_ICON_PALETTE);
-    selectionToolColor->setTooltip("Set Selection Color");
-    selectionToolColor->setCallback([this]() {
-        if (curTool == selectionTool)
-            selectionTool->setSelectionColor(*inlay, *fgcolor);
-    });
 
     // export color report button
     Button *colorReport = new Button(palette, "Color Report", 0);
@@ -174,11 +175,11 @@ void MailleScreen::setTool(std::shared_ptr<Tool> tool)
     curTool = tool;
 }
 
-nanogui::Button *MailleScreen::addToolButton(nanogui::Widget *parent,
-                                             std::shared_ptr<Tool> tool,
-                                             const std::string &tooltip)
+OptionalPopupButton *MailleScreen::addToolButton(nanogui::Widget *parent,
+                                                 std::shared_ptr<Tool> tool,
+                                                 const std::string &tooltip)
 {
-    nanogui::Button *b = new nanogui::Button(parent, "", tool->getIcon());
+    OptionalPopupButton *b = new OptionalPopupButton(parent, "", tool->getIcon());
     b->setFlags(nanogui::Button::RadioButton);
     b->setTooltip(tooltip);
     b->setCallback([this, tool]() { setTool(tool); });

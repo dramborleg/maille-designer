@@ -8,6 +8,7 @@
 #include "mailleinlay.h"
 
 class ColorPickerTool;
+class OptionalPopupButton;
 class PaintTool;
 class RingGLCanvas;
 class SelectionTool;
@@ -28,9 +29,9 @@ public:
 private:
     void simulateButtonClick(nanogui::Button *b);
     void setTool(std::shared_ptr<Tool> tool);
-    nanogui::Button *addToolButton(nanogui::Widget *parent,
-                                   std::shared_ptr<Tool> tool,
-                                   const std::string &tooltip);
+    OptionalPopupButton *addToolButton(nanogui::Widget *parent,
+                                       std::shared_ptr<Tool> tool,
+                                       const std::string &tooltip);
     std::unordered_map<Maille::Color, unsigned, Maille::ColorHash> getColorReport() const;
     void exportColorReport();
     void saveFile() const;
@@ -53,11 +54,11 @@ private:
     std::shared_ptr<PaintTool> paintTool;
     std::shared_ptr<Tool> curTool;
     // Tool buttons
-    nanogui::Button *colorPickerButton;
-    nanogui::Button *adderButton;
-    nanogui::Button *selectionButton;
-    nanogui::Button *translationButton;
-    nanogui::Button *paintButton;
+    OptionalPopupButton *colorPickerButton;
+    OptionalPopupButton *adderButton;
+    OptionalPopupButton *selectionButton;
+    OptionalPopupButton *translationButton;
+    OptionalPopupButton *paintButton;
     // Global foreground color
     std::shared_ptr<Maille::Color> fgcolor;
 };

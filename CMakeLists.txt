@@ -73,6 +73,7 @@ set(SOURCE_FILES
   src/tools/painttool.h src/tools/painttool.cpp
   src/weaves/weave.h
   src/weaves/european4in1.h src/weaves/european4in1.cpp
+  src/nanogui/optionalpopupbutton.h
 )
 
 # Enable warnings for our source files
