@@ -34,7 +34,7 @@ private:
 
     bool selected = true;
     float r = 1.0;
-    float shininess = 1.0;
+    float shininess = 6.0;
     float thickness = 0.278;
     unsigned nTheta = 32;
     unsigned nAlpha = 16;

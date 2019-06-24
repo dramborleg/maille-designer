@@ -56,9 +56,9 @@ RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
         "}");
 
     aIntensity = 0.6;
-    dIntensity = 0.4;
-    sIntensity = 0.8;
-    lDirection << -0.4, 0.4, -0.2;
+    dIntensity = 0.2;
+    sIntensity = 0.9;
+    lDirection << -0.2, 0.2, -0.8;
     lDirection.normalize();
 
     this->inlay->mvp.setIdentity();
