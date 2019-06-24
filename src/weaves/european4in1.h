@@ -34,6 +34,8 @@ private:
     bool addRingByIndex(const std::pair<int, int> &index,
                         const Maille::Color &color, MailleInlay &inlay);
     void swapWay(MailleInlay &inlay);
+    void recalculateRingTransformations(MailleInlay &inlay);
+    void resetARValues(MailleInlay &inlay);
     std::pair<float, float> idxToPos(const std::pair<int, int> &idx) const;
     const Eigen::Matrix4f &idxToRot(const std::pair<int, int> &idx) const;
 
@@ -42,9 +44,7 @@ private:
 
     nanogui::CheckBox *wrongWay;
     nanogui::CheckBox *rotateInlay;
-    float radius = 1.0;
-    float thickness = 0.278;
-    float theta;
+    nanogui::FloatBox<float> *ar;
     float xDist;
     float yDist;
     Eigen::Matrix4f rot0WrongWay;

@@ -4,9 +4,14 @@
 #include "common.h"
 #include "torus.h"
 
-Torus::Torus(const Maille::Color &color)
-    : color(color)
+Torus::Torus(const Maille::Color &color, float AR, unsigned nTheta,
+             unsigned nAlpha)
+    : nTheta(nTheta)
+    , nAlpha(nAlpha)
+    , color(color)
 {
+    r = 1.0;
+    thickness = r / AR;
     init();
 }
 
@@ -87,6 +92,13 @@ void Torus::set_center(float x, float y)
     translation(1, 3) = y;
 
     compute_points();
+}
+
+void Torus::set_AR(float AR)
+{
+    r = 1.0;
+    thickness = r / AR;
+    init();
 }
 
 void Torus::set_rotation(const nanogui::Matrix4f &rotation)

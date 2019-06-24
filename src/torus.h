@@ -7,7 +7,8 @@
 class Torus
 {
 public:
-    Torus(const Maille::Color &color);
+    Torus(const Maille::Color &color, float AR = 3.6, unsigned nTheta = 32,
+          unsigned nAlpha = 16);
 
     nanogui::MatrixXf get_positions() const;
     nanogui::MatrixXf get_normals() const;
@@ -20,6 +21,7 @@ public:
     bool get_selected() const { return selected; }
     void set_rotation(const nanogui::Matrix4f &rotation);
     void set_center(float x, float y);
+    void set_AR(float AR);
     void set_color(const Maille::Color &color) { this->color = color; }
     void set_selected(bool sel) { selected = sel; }
     nanogui::Vector2f get_center() const;
@@ -33,11 +35,11 @@ private:
     void compute_normals();
 
     bool selected = true;
-    float r = 1.0;
     float shininess = 6.0;
-    float thickness = 0.278;
-    unsigned nTheta = 32;
-    unsigned nAlpha = 16;
+    float r;
+    float thickness;
+    unsigned nTheta;
+    unsigned nAlpha;
     nanogui::MatrixXf positions;
     nanogui::MatrixXf normals;
     nanogui::MatrixXu indices;

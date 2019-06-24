@@ -6,6 +6,7 @@
 #include <nanogui/checkbox.h>
 #include <nanogui/layout.h>
 #include <nanogui/messagedialog.h>
+#include <nanogui/textbox.h>
 #include <nanogui/window.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -22,28 +23,6 @@ European4in1::European4in1(nanogui::Window *weaveSettings,
 {
     using namespace nanogui;
 
-    theta = atan(1.5 * thickness / radius);
-    xDist = 1.85 * radius - 2 * thickness;
-    yDist = radius - thickness;
-    // clang-format off
-    rot0WrongWay << 1.0, 0.0,        0.0,         0.0,
-                    0.0, cos(theta), -sin(theta), 0.0,
-                    0.0, sin(theta), cos(theta),  0.0,
-                    0.0, 0.0,        0.0,         1.0;
-    rot1WrongWay << 1.0, 0.0,         0.0,          0.0,
-                    0.0, cos(-theta), -sin(-theta), 0.0,
-                    0.0, sin(-theta), cos(-theta),  0.0,
-                    0.0, 0.0,         0.0,          1.0;
-    rot0RightWay << cos(theta), 0.0, -sin(theta), 0.0,
-                    0.0,        1.0, 0.0,         0.0,
-                    sin(theta), 0.0, cos(theta),  0.0,
-                    0.0,        0.0, 0.0,         1.0;
-    rot1RightWay << cos(-theta), 0.0, -sin(-theta), 0.0,
-                    0.0,         1.0, 0.0,          0.0,
-                    sin(-theta), 0.0, cos(-theta),  0.0,
-                    0.0,         0.0, 0.0,          1.0;
-    // clang-format on
-
     weaveSettings->setLayout(new GroupLayout());
 
     wrongWay = new CheckBox(weaveSettings, "Wrong Way");
@@ -53,6 +32,15 @@ European4in1::European4in1(nanogui::Window *weaveSettings,
     rotateInlay = new CheckBox(weaveSettings, "Rotate Inlay            ");
     rotateInlay->setTooltip("Whether or not to rotate inlay design when "
                             "switching between wrong way and right way");
+
+    ar = new FloatBox<float>(weaveSettings, 3.6);
+    ar->setEditable(true);
+    ar->setSpinnable(true);
+    ar->setMinMaxValues(3, 10);
+    ar->setUnits("AR");
+    ar->setCallback([this, inlay](float val) { resetARValues(*inlay); });
+
+    resetARValues(*inlay);
 }
 
 void European4in1::addRing(const Eigen::Vector2f &worldClickLoc,
@@ -176,6 +164,7 @@ std::shared_ptr<cpptoml::table>
     root->insert("WeaveID", weaveID);
     root->insert("Version", VERSION);
     root->insert("WrongWay", wrongWay->checked());
+    root->insert("AR", ar->value());
     root->insert("Indices", indices);
     root->insert("Colors", colors);
 
@@ -191,6 +180,7 @@ void European4in1::importSaveFile(nanogui::Widget *parent,
     auto indices = design->get_array_of<cpptoml::array>("Indices");
     auto colors = design->get_array_of<cpptoml::array>("Colors");
     auto wrongWay = design->get_as<bool>("WrongWay");
+    auto AR = design->get_as<double>("AR");
 
     if (!indices || !colors)
     {
@@ -216,6 +206,9 @@ void European4in1::importSaveFile(nanogui::Widget *parent,
     }
     else
         this->wrongWay->setChecked(*wrongWay);
+
+    if (AR)
+        ar->callback()(std::to_string(*AR));
 
     max = std::min(indices->size(), colors->size());
     for (size_t i = 0; i < max; i++)
@@ -302,7 +295,7 @@ bool European4in1::addRingByIndex(const std::pair<int, int> &index,
     if (idxIt != rings.end())
         return false;
 
-    auto t = std::make_shared<Torus>(color);
+    auto t = std::make_shared<Torus>(color, ar->value());
     std::pair<float, float> center = idxToPos(index);
     t->set_center(center.first, center.second);
     t->set_rotation(idxToRot(index));
@@ -350,6 +343,11 @@ void European4in1::swapWay(MailleInlay &inlay)
         rotRings.swap(rings);
     }
 
+    recalculateRingTransformations(inlay);
+}
+
+void European4in1::recalculateRingTransformations(MailleInlay &inlay)
+{
     for (auto &r : rings)
     {
         std::pair<float, float> center = idxToPos(r.first);
@@ -358,4 +356,37 @@ void European4in1::swapWay(MailleInlay &inlay)
     }
 
     inlay.ringsModified = true;
+}
+
+void European4in1::resetARValues(MailleInlay &inlay)
+{
+    float AR = ar->value();
+    float radius = 1.0;
+    float thickness = radius / AR;
+    float theta = atan(1.5 * thickness / radius);
+    xDist = 1.85 * radius - 2 * thickness;
+    yDist = radius - thickness;
+    // clang-format off
+    rot0WrongWay << 1.0, 0.0,        0.0,         0.0,
+                    0.0, cos(theta), -sin(theta), 0.0,
+                    0.0, sin(theta), cos(theta),  0.0,
+                    0.0, 0.0,        0.0,         1.0;
+    rot1WrongWay << 1.0, 0.0,         0.0,          0.0,
+                    0.0, cos(-theta), -sin(-theta), 0.0,
+                    0.0, sin(-theta), cos(-theta),  0.0,
+                    0.0, 0.0,         0.0,          1.0;
+    rot0RightWay << cos(theta), 0.0, -sin(theta), 0.0,
+                    0.0,        1.0, 0.0,         0.0,
+                    sin(theta), 0.0, cos(theta),  0.0,
+                    0.0,        0.0, 0.0,         1.0;
+    rot1RightWay << cos(-theta), 0.0, -sin(-theta), 0.0,
+                    0.0,         1.0, 0.0,          0.0,
+                    sin(-theta), 0.0, cos(-theta),  0.0,
+                    0.0,         0.0, 0.0,          1.0;
+    // clang-format on
+
+    for (auto &r : rings)
+        r.second->set_AR(AR);
+
+    recalculateRingTransformations(inlay);
 }
