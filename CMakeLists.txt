@@ -59,7 +59,7 @@ include_directories(src)
 # Compile main maille-designer library
 set(SOURCE_FILES
   main.cpp
-  src/common.h
+  src/common.h src/common.cpp
   src/mailleinlay.h
   src/torus.h src/torus.cpp
   src/ringglcanvas.h src/ringglcanvas.cpp
@@ -69,6 +69,7 @@ set(SOURCE_FILES
   src/tools/weaveaddtool.h src/tools/weaveaddtool.cpp
   src/tools/selectiontool.h src/tools/selectiontool.cpp
   src/tools/colorpickertool.h src/tools/colorpickertool.cpp
+  src/tools/colorselecttool.h src/tools/colorselecttool.cpp
   src/tools/translationtool.h src/tools/translationtool.cpp
   src/tools/painttool.h src/tools/painttool.cpp
   src/weaves/weave.h
