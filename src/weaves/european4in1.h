@@ -30,6 +30,12 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
+    void importV0File(nanogui::Widget *parent,
+                      std::shared_ptr<cpptoml::table> design,
+                      MailleInlay &inlay);
+    void importLatestFile(nanogui::Widget *parent,
+                          std::shared_ptr<cpptoml::table> design,
+                          MailleInlay &inlay);
     std::pair<int, int> nearestRing(const Eigen::Vector2f &loc);
     bool addRingByIndex(const std::pair<int, int> &index,
                         const Maille::Color &color, MailleInlay &inlay);

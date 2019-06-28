@@ -15,5 +15,15 @@ struct ColorHash
     }
 };
 
+struct ColorCompare
+{
+    bool operator()(const Color &c1, const Color &c2) const
+    {
+        size_t h1 = ColorHash()(c1);
+        size_t h2 = ColorHash()(c2);
+        return h1 < h2;
+    }
+};
+
 float colorDistance(const Maille::Color &c0, const Maille::Color &c1);
 } // namespace Maille

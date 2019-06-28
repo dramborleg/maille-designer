@@ -1,8 +1,9 @@
 #include <algorithm>
 #include <cmath>
-#include <cpptoml.h>
+#include <set>
 #include <stdexcept>
 
+#include <cpptoml.h>
 #include <nanogui/checkbox.h>
 #include <nanogui/layout.h>
 #include <nanogui/messagedialog.h>
@@ -146,18 +147,35 @@ std::shared_ptr<cpptoml::table>
     auto indices = cpptoml::make_array();
     auto colors = cpptoml::make_array();
 
+    // Could get a better time complexity using unordered_map + vector, but I
+    // spent a while figuring out how to use Color objects as keys so may as
+    // well keep it around for future reference.
+    //
+    // There should never be a tie for the ordering of two Color objects since
+    // the hash function returns unique values for each Color (unless
+    // sizeof(size_t) < 4B), so we can use find and distance to determine their
+    // indices in the save file array.
+    std::set<Maille::Color, Maille::ColorCompare> colorIndices;
+
+    for (const auto &r : rings)
+        colorIndices.insert(r.second->get_color());
+
     for (const auto &r : rings)
     {
         auto idx = cpptoml::make_array();
-        auto color = cpptoml::make_array();
-        Maille::Color c = r.second->get_color();
         idx->push_back(r.first.first);
         idx->push_back(r.first.second);
+        idx->push_back(std::distance(colorIndices.begin(),
+                                     colorIndices.find(r.second->get_color())));
+        indices->push_back(idx);
+    }
+
+    for (const auto &c : colorIndices)
+    {
+        auto color = cpptoml::make_array();
         color->push_back(c(0));
         color->push_back(c(1));
         color->push_back(c(2));
-
-        indices->push_back(idx);
         colors->push_back(color);
     }
 
@@ -175,12 +193,97 @@ void European4in1::importSaveFile(nanogui::Widget *parent,
                                   std::shared_ptr<cpptoml::table> design,
                                   MailleInlay &inlay)
 {
-    size_t max;
+    auto vx = design->get_as<int>("Version");
+
+    if (!vx)
+        new nanogui::MessageDialog(
+            parent, nanogui::MessageDialog::Type::Information,
+            "Import Information",
+            "This does not appear to be a Maille Inlay Designer file. "
+            "Import aborted.");
+    else if (*vx == VERSION)
+        importLatestFile(parent, design, inlay);
+    else if (*vx == 0)
+        importV0File(parent, design, inlay);
+}
+
+void European4in1::importLatestFile(nanogui::Widget *parent,
+                                    std::shared_ptr<cpptoml::table> design,
+                                    MailleInlay &inlay)
+{
     bool success = true;
     auto indices = design->get_array_of<cpptoml::array>("Indices");
     auto colors = design->get_array_of<cpptoml::array>("Colors");
     auto wrongWay = design->get_as<bool>("WrongWay");
     auto AR = design->get_as<double>("AR");
+    std::vector<Maille::Color> importedColors;
+
+    if (!indices || !colors)
+    {
+        success = false;
+        goto out;
+    }
+
+    if (!wrongWay)
+        success = false;
+    else
+        this->wrongWay->setChecked(*wrongWay);
+
+    if (!AR)
+        success = false;
+    else
+        ar->callback()(std::to_string(*AR));
+
+    for (size_t i = 0; i < colors->size(); i++)
+    {
+        auto c = (*colors)[i]->get_array_of<int64_t>();
+        if (!c || (*c).size() != 3)
+        {
+            success = false;
+            continue;
+        }
+        importedColors.push_back(Maille::Color((*c)[0], (*c)[1], (*c)[2]));
+    }
+
+    for (size_t i = 0; i < indices->size(); i++)
+    {
+        auto idx = (*indices)[i]->get_array_of<int64_t>();
+
+        if (!idx || idx->size() != 3 || (*idx)[2] >= importedColors.size())
+        {
+            success = false;
+            continue;
+        }
+
+        if (!addRingByIndex({(*idx)[0], (*idx)[1]}, importedColors[(*idx)[2]],
+                            inlay))
+            success = false;
+    }
+
+out:
+    if (!success)
+        new nanogui::MessageDialog(
+            parent, nanogui::MessageDialog::Type::Warning, "Import Error",
+            "Error while importing design file. Possible file corruption.");
+}
+
+void European4in1::importV0File(nanogui::Widget *parent,
+                                std::shared_ptr<cpptoml::table> design,
+                                MailleInlay &inlay)
+{
+    size_t max;
+    bool success = true;
+    auto indices = design->get_array_of<cpptoml::array>("Indices");
+    auto colors = design->get_array_of<cpptoml::array>("Colors");
+
+    new nanogui::MessageDialog(
+        parent, nanogui::MessageDialog::Type::Information, "Import Information",
+        "It seems this save file is from an older version of Maille Inlay "
+        "Designer. If you designed this file while using a rotated view so "
+        "that it looked like the Right Way, please check the \"Rotate "
+        "Inlay\" checkbox and afterwards uncheck the Wrong Way checkbox to "
+        "get your old configuration, then resave the file so in the future "
+        "it will load the Right Way by default.");
 
     if (!indices || !colors)
     {
@@ -191,24 +294,8 @@ void European4in1::importSaveFile(nanogui::Widget *parent,
     if (indices->size() != colors->size())
         success = false;
 
-    if (!wrongWay)
-    {
-        new nanogui::MessageDialog(
-            parent, nanogui::MessageDialog::Type::Information,
-            "Import Information",
-            "It seems this save file is from an older version of Maille Inlay "
-            "Designer. If you designed this file while using a rotated view so "
-            "that it looked like the Right Way, please check the \"Rotate "
-            "Inlay\" checkbox and afterwards uncheck the Wrong Way checkbox to "
-            "get your old configuration, then resave the file so in the future "
-            "it will load the Right Way by default.");
-        this->wrongWay->setChecked(true);
-    }
-    else
-        this->wrongWay->setChecked(*wrongWay);
-
-    if (AR)
-        ar->callback()(std::to_string(*AR));
+    wrongWay->setChecked(true);
+    ar->callback()("3.6");
 
     max = std::min(indices->size(), colors->size());
     for (size_t i = 0; i < max; i++)
