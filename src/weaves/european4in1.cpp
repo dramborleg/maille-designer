@@ -327,7 +327,7 @@ out:
 void European4in1::importImage(nanogui::Widget *parent, std::string fpath,
                                MailleInlay &inlay)
 {
-    int xdim, ydim, nchan;
+    int xdim, ydim, nchan, yOffset;
     unsigned char *img = stbi_load(fpath.c_str(), &xdim, &ydim, &nchan, 3);
     if (img == nullptr)
     {
@@ -341,14 +341,19 @@ void European4in1::importImage(nanogui::Widget *parent, std::string fpath,
     inlay.rings.clear();
     rings.clear();
 
-    for (int x = 0; x < xdim; x++)
+    // If ydim is odd, we need to add one to the y coordinate so we stay on the
+    // expected grid values and don't end up with addRingsInArea adding rings in
+    // between other rings where they don't belong, eg adding a ring at index
+    // (0, 1), which is supposed to be empty.
+    yOffset = ydim % 2 ? 0 : 1;
+    for (int y = 0; y < ydim; y++)
     {
-        for (int y = 0; y < ydim; y++)
+        for (int x = 0; x < xdim; x++)
         {
             int idx = nchan * y * xdim + nchan * x;
             Maille::Color c(img[idx], img[idx + 1], img[idx + 2]);
             int xIdx = y % 2 ? 2 * x : 2 * x - 1;
-            int yIdx = ydim - y;
+            int yIdx = ydim - y + yOffset;
             addRingByIndex({xIdx, yIdx}, c, inlay);
         }
     }
