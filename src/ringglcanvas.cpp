@@ -120,8 +120,6 @@ void RingGLCanvas::uploadRingData()
 bool RingGLCanvas::mouseButtonEvent(const Eigen::Vector2i &p, int button,
                                     bool down, int modifiers)
 {
-    requestFocus();
-
     Eigen::Vector2f pos = canvasToWorld(p);
     if (button == 2)
         return translate->mouseButtonEvent(p, button, down, modifiers, pos,
@@ -134,8 +132,6 @@ bool RingGLCanvas::mouseMotionEvent(const Eigen::Vector2i &p,
                                     const Eigen::Vector2i &rel, int button,
                                     int modifiers)
 {
-    requestFocus();
-
     Eigen::Vector2f pos = canvasToWorld(p);
     // This else statement is very hacky, but unfortunately it seems that
     // nanogui isn't passing a button event when the scroll wheel button (2) is
