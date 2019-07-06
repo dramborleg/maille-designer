@@ -158,6 +158,10 @@ MailleScreen::MailleScreen()
     importImageButton->setTooltip("Create a design from an input image");
     importImageButton->setCallback([this]() { importImage(); });
 
+    // export POV button
+    Button *exportPOVButton = new Button(palette, "Export POV", 0);
+    exportPOVButton->setCallback([this]() { exportPOV(); });
+
     // save file and load file buttons
     Button *saveFileButton = new Button(palette, "Save", ENTYPO_ICON_SAVE);
     saveFileButton->setCallback([this]() { saveFile(); });
@@ -334,6 +338,21 @@ void MailleScreen::importImage()
     }
     else
         weaveManager->importImage(this, fpath, *inlay);
+}
+
+void MailleScreen::exportPOV() const
+{
+    std::string fpath = nanogui::file_dialog({{"pov", ""}}, true);
+
+    if (fpath == "")
+        return;
+
+    if (fpath.size() < 4 || fpath.substr(fpath.size() - 4, 4) != ".pov")
+        fpath += ".pov";
+
+    std::string out = weaveManager->exportPOV(*inlay);
+    std::ofstream f(fpath);
+    f << out;
 }
 
 void MailleScreen::saveFile() const

@@ -29,4 +29,5 @@ public:
                              MailleInlay &inlay)
     {
     }
+    virtual std::string exportPOV(const MailleInlay &inlay) const { return ""; }
 };

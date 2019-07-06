@@ -25,6 +25,7 @@ public:
                         MailleInlay &inlay) override;
     void importImage(nanogui::Widget *parent, std::string fpath,
                      MailleInlay &inlay) override;
+    std::string exportPOV(const MailleInlay &inlay) const override;
     static std::string getWeaveID() { return weaveID; }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -51,6 +52,9 @@ private:
     nanogui::CheckBox *wrongWay;
     nanogui::CheckBox *rotateInlay;
     nanogui::FloatBox<float> *ar;
+    const float radius = 1.0;
+    float thickness;
+    float theta;
     float xDist;
     float yDist;
     Eigen::Matrix4f rot0WrongWay;

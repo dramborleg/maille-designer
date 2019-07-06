@@ -37,6 +37,7 @@ private:
         getColorReport() const;
     void exportColorReport();
     void importImage();
+    void exportPOV() const;
     void saveFile() const;
     void loadFile();
 

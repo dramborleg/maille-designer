@@ -1,4 +1,6 @@
+#define _USE_MATH_DEFINES
 #include <algorithm>
+#include <climits>
 #include <cmath>
 #include <set>
 #include <stdexcept>
@@ -352,6 +354,79 @@ void European4in1::importImage(nanogui::Widget *parent, std::string fpath,
     }
 }
 
+std::string European4in1::exportPOV(const MailleInlay &inlay) const
+{
+    if (!inlay.rings.size())
+        return "";
+
+    std::string rot;
+    std::ostringstream out(Maille::POV_TEMPLATE, std::ios_base::ate);
+    std::pair<int, int> minIdx = {INT_MAX, INT_MAX};
+    std::pair<int, int> maxIdx = {INT_MIN, INT_MIN};
+    std::pair<float, float> minBound;
+    std::pair<float, float> maxBound;
+    std::set<Maille::Color, Maille::ColorCompare> colors;
+    float camX, camZ, camRadius;
+    float thetaDeg = theta * 180 / M_PI;
+
+    for (const auto &r : rings)
+    {
+        minIdx.first = std::min(minIdx.first, r.first.first);
+        maxIdx.first = std::max(maxIdx.first, r.first.first);
+        minIdx.second = std::min(minIdx.second, r.first.second);
+        maxIdx.second = std::max(maxIdx.second, r.first.second);
+        colors.insert(r.second->get_color());
+    }
+
+    minBound = idxToPos({minIdx.first, minIdx.second});
+    maxBound = idxToPos({maxIdx.first, maxIdx.second});
+    camX = (minBound.first + maxBound.first) / 2;
+    camZ = (minBound.second + maxBound.second) / 2;
+    camRadius = std::max(maxBound.first - camX, maxBound.second - camZ);
+    camRadius = 2 * (camRadius + radius + thickness) + radius;
+
+    // camera parameters
+    out << "camera {\n"
+        << "  orthographic\n"
+        << "  location  <" << camX << ", 1, " << camZ << ">\n"
+        << "  right     <" << camRadius << ", 0, 0>\n"
+        << "  up        <0, 0, " << camRadius << ">\n"
+        << "  direction <0, -1, 0>\n"
+        << "  look_at   <" << camX << ", 0, " << camZ << ">\n}\n\n";
+
+    // textures
+    for (const auto &c : colors)
+    {
+        out << "#declare T_" << Maille::ColorHash()(c) << " = texture { "
+            << "pigment { color rgb <" << c(0) / 255.0 << ", " << c(1) / 255.0
+            << ", " << c(2) / 255.0 << "> } finish { F_Metal } }\n";
+    }
+
+    for (const auto &r : rings)
+    {
+        if (wrongWay->checked())
+        {
+            rot = r.first.first % 2 ? "<-" : "<";
+            rot += std::to_string(thetaDeg) + ", 0, 0>\n";
+        }
+        else
+        {
+            rot = r.first.second % 2 ? "<0, 0, -" : "<0, 0, ";
+            rot += std::to_string(thetaDeg) + ">\n";
+        }
+        Eigen::Vector2f ctr = r.second->get_center();
+        // clang-format off
+        out << "\ntorus {\n  " << radius << ", " << radius / ar->value() << "\n"
+            << "  rotate " << rot
+            << "  translate<" << ctr(0) << ", 0, " << ctr(1) << ">\n"
+            << "  texture { T_" << Maille::ColorHash()(r.second->get_color())
+            << " }\n}";
+        // clang-format on
+    }
+
+    return out.str();
+}
+
 std::pair<int, int> European4in1::nearestRing(const Eigen::Vector2f &loc)
 {
     if (rings.empty())
@@ -448,9 +523,8 @@ void European4in1::recalculateRingTransformations(MailleInlay &inlay)
 void European4in1::resetARValues(MailleInlay &inlay)
 {
     float AR = ar->value();
-    float radius = 1.0;
-    float thickness = radius / AR;
-    float theta = atan(1.5 * thickness / radius);
+    theta = atan(1.5 / AR);
+    thickness = radius / AR;
     xDist = 1.85 * radius - 2 * thickness;
     yDist = radius - thickness;
     // clang-format off
