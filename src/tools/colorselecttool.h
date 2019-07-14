@@ -6,7 +6,7 @@ class ColorSelectTool : public SelectionTool
 {
 public:
     ColorSelectTool(int icon, std::shared_ptr<Weave> weaveManager,
-                    nanogui::Slider *distance);
+                    nanogui::Slider *distance, nanogui::CheckBox *adjacent);
     virtual bool mouseButtonEvent(const Eigen::Vector2i &p, int button,
                                   bool down, int modifiers,
                                   const Eigen::Vector2f &worldPos,
@@ -18,4 +18,5 @@ public:
 
 private:
     nanogui::Slider *distance;
+    nanogui::CheckBox *adjacent;
 };

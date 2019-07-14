@@ -29,8 +29,10 @@ public:
 
 protected:
     void setSelection(MailleInlay &inlay, bool selected);
+    bool withinSelectDistance(float dist, const Torus &t);
 
     bool ctrlDown = false;
+    std::shared_ptr<Weave> weaveManager;
 
 private:
     bool completeDragEvent(const Eigen::Vector2f &worldPos, MailleInlay &inlay);
@@ -42,5 +44,4 @@ private:
     Eigen::Vector2f dragBeginWorld;
     // location of cursor during most recent drag event that was processed
     Eigen::Vector2f dragPrevWorld;
-    std::shared_ptr<Weave> weaveManager;
 };

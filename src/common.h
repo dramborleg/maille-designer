@@ -25,6 +25,16 @@ struct ColorCompare
     }
 };
 
+struct IntPairHash
+{
+    size_t operator()(const std::pair<int, int> &p) const
+    {
+        size_t h1 = std::hash<int>()(p.first);
+        size_t h2 = std::hash<int>()(p.second);
+        return h1 ^ h2;
+    }
+};
+
 float colorDistance(const Maille::Color &c0, const Maille::Color &c1);
 
 // clang-format off

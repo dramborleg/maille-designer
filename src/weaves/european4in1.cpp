@@ -4,6 +4,7 @@
 #include <cmath>
 #include <set>
 #include <stdexcept>
+#include <unordered_set>
 
 #include <cpptoml.h>
 #include <nanogui/checkbox.h>
@@ -139,6 +140,51 @@ void European4in1::deleteRing(const Eigen::Vector2f &worldClickLoc,
     }
     catch (std::domain_error &e)
     {
+    }
+}
+
+void European4in1::selectAdjacentColors(const Eigen::Vector2f &worldClickLoc,
+                                        float threshold, MailleInlay &inlay)
+{
+    std::pair<int, int> nearIdx;
+    try
+    {
+        nearIdx = nearestRing(worldClickLoc);
+    }
+    catch (std::domain_error &e)
+    {
+        return;
+    }
+
+    // ideally we could use get_selected() to check if a ring had already been
+    // visited, but since it is possible for rings to already be selected at the
+    // beginning (ie if control key is held down) then we have to keep track of
+    // the visited rings in a separate way, which we do with this set of indices
+    std::unordered_set<std::pair<int, int>, Maille::IntPairHash> visited;
+    std::vector<std::pair<int, int>> bag;
+    Maille::Color refColor = rings[nearIdx]->get_color();
+    visited.insert(nearIdx);
+    bag.push_back(nearIdx);
+
+    while (!bag.empty())
+    {
+        std::pair<int, int> r = bag.back();
+        bag.pop_back();
+
+        if (Maille::colorDistance(refColor, rings[r]->get_color()) > threshold)
+            continue;
+
+        rings[r]->set_selected(true);
+
+        auto neighbors = getNeighbors(r);
+        for (const std::pair<int, int> &n : neighbors)
+        {
+            if (visited.find(n) == visited.end())
+            {
+                visited.insert(n);
+                bag.push_back(n);
+            }
+        }
     }
 }
 
@@ -481,6 +527,25 @@ const Eigen::Matrix4f &
         return idx.first % 2 ? rot1WrongWay : rot0WrongWay;
 
     return idx.second % 2 ? rot1RightWay : rot0RightWay;
+}
+
+std::vector<std::pair<int, int>>
+    European4in1::getNeighbors(const std::pair<int, int> &idx) const
+{
+    std::vector<std::pair<int, int>> candidates = {
+        {idx.first - 1, idx.second - 1},
+        {idx.first - 1, idx.second + 1},
+        {idx.first + 1, idx.second - 1},
+        {idx.first + 1, idx.second + 1}};
+    std::vector<std::pair<int, int>> neighbors;
+
+    for (const auto &idx : candidates)
+    {
+        if (rings.find(idx) != rings.end())
+            neighbors.push_back(idx);
+    }
+
+    return neighbors;
 }
 
 std::pair<float, float>

@@ -36,7 +36,7 @@ bool SelectionTool::mouseButtonEvent(const Eigen::Vector2i &p, int button,
 
     auto nearest = findNearestRing(inlay, worldPos);
 
-    if (nearest.second > 2 * nearest.first->get_radius())
+    if (!withinSelectDistance(nearest.second, *nearest.first))
     {
         setSelection(inlay, false);
         return true;
@@ -172,4 +172,9 @@ bool SelectionTool::coordinateInBox(const Eigen::Vector2f &p0,
 
     return (location(0) > minCoord(0) && location(0) < maxCoord(0) &&
             location(1) > minCoord(1) && location(1) < maxCoord(1));
+}
+
+bool SelectionTool::withinSelectDistance(float dist, const Torus &t)
+{
+    return dist < 2 * t.get_radius();
 }

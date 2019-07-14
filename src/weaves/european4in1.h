@@ -18,6 +18,8 @@ public:
                         MailleInlay &inlay) override;
     void deleteRing(const Eigen::Vector2f &worldClickLoc,
                     MailleInlay &inlay) override;
+    void selectAdjacentColors(const Eigen::Vector2f &worldClickLoc,
+                              float threshold, MailleInlay &inlay) override;
     std::shared_ptr<cpptoml::table>
         generateSaveFile(const MailleInlay &inlay) const override;
     void importSaveFile(nanogui::Widget *parent,
@@ -45,6 +47,8 @@ private:
     void resetARValues(MailleInlay &inlay);
     std::pair<float, float> idxToPos(const std::pair<int, int> &idx) const;
     const Eigen::Matrix4f &idxToRot(const std::pair<int, int> &idx) const;
+    std::vector<std::pair<int, int>>
+        getNeighbors(const std::pair<int, int> &idx) const;
 
     static const std::string weaveID;
     static const int VERSION;

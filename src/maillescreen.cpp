@@ -113,19 +113,24 @@ MailleScreen::MailleScreen()
 
     // fuzzy color select button
     Slider *threshold = new Slider(nullptr);
+    CheckBox *adjColors = new CheckBox(nullptr, "Require adjacency");
     colorSelectTool = std::make_shared<ColorSelectTool>(
-        ENTYPO_ICON_BOWL, weaveManager, threshold);
+        ENTYPO_ICON_BOWL, weaveManager, threshold, adjColors);
     colorSelectButton =
         addToolButton(toolsWidget, colorSelectTool, "Select by Color");
     colorSelectButton->enablePopup(true);
     sPopup = colorSelectButton->popup();
     sPopup->setLayout(new GroupLayout());
+    // sPopup buttons widget
+    Widget *sPButtons = new Widget(sPopup);
+    sPButtons->setLayout(
+        new BoxLayout(Orientation::Horizontal, Alignment::Minimum));
     // color select tool buttons
-    Button *colorSelToolDelete = new Button(sPopup, "", ENTYPO_ICON_TRASH);
+    Button *colorSelToolDelete = new Button(sPButtons, "", ENTYPO_ICON_TRASH);
     colorSelToolDelete->setTooltip("Delete Selection");
     colorSelToolDelete->setCallback(
         [this]() { colorSelectTool->deleteSelection(*inlay); });
-    Button *colorSelToolColor = new Button(sPopup, "", ENTYPO_ICON_PALETTE);
+    Button *colorSelToolColor = new Button(sPButtons, "", ENTYPO_ICON_PALETTE);
     colorSelToolColor->setTooltip("Set Selection Color");
     colorSelToolColor->setCallback(
         [this]() { colorSelectTool->setSelectionColor(*inlay, *fgcolor); });
@@ -139,6 +144,10 @@ MailleScreen::MailleScreen()
     threshold->setCallback([thresholdText](float val) {
         thresholdText->setValue(std::to_string((int)val));
     });
+    // color select tool require adjacency checkbox
+    sPopup->addChild(adjColors);
+    adjColors->setTooltip("Selects only adjacent chunks of rings, rings which "
+                          "are not part of the selected island are excluded");
 
     // put tool buttons in same radio button group
     adderButton->setButtonGroup(toolButtons);
