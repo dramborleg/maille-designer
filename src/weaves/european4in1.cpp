@@ -329,6 +329,7 @@ void European4in1::importImage(nanogui::Widget *parent, std::string fpath,
 {
     int xdim, ydim, nchan, yOffset;
     unsigned char *img = stbi_load(fpath.c_str(), &xdim, &ydim, &nchan, 3);
+    nchan = 3;
     if (img == nullptr)
     {
         std::string error_msg = "failed to allocate memory for image";
