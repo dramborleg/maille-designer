@@ -46,12 +46,6 @@ MailleScreen::MailleScreen()
     paintTool = std::make_shared<PaintTool>(ENTYPO_ICON_ROUND_BRUSH, fgcolor);
     curTool = adderTool;
 
-    // Ring Canvas
-    mCanvas = new RingGLCanvas(this, inlay, curTool, translationTool);
-    mCanvas->setPosition(Vector2i(200, 0));
-    mCanvas->setBackgroundColor({100, 100, 100, 255});
-    mCanvas->resize({width() - 200, height()});
-
     // Tool Palette and Widget Window
     Window *palette = new Window(this, "Tools");
     palette->setPosition(Vector2i(0, 0));
@@ -70,6 +64,12 @@ MailleScreen::MailleScreen()
     brightness->setValue(inlay->ambientIntensity);
     brightness->setCallback(
         [this](float val) { inlay->ambientIntensity = val; });
+    // zoom sensitivity slider to widget
+    new Label(palette, "Zoom Sensitivity", "sans-bold");
+    Slider *zoom = new Slider(palette);
+    zoom->setTooltip("How quickly zoom changes when scrolling");
+    zoom->setValue(2);
+    zoom->setRange({0.3, 6});
     // Global foreground color selector
     ColorWheel *wheel = new ColorWheel(palette);
     wheel->setCallback([this](const Color &col) {
@@ -167,6 +167,12 @@ MailleScreen::MailleScreen()
     saveFileButton->setCallback([this]() { saveFile(); });
     Button *loadFileButton = new Button(palette, "Load", ENTYPO_ICON_FOLDER);
     loadFileButton->setCallback([this]() { loadFile(); });
+
+    // Ring Canvas
+    mCanvas = new RingGLCanvas(this, inlay, curTool, translationTool, zoom);
+    mCanvas->setPosition(Vector2i(200, 0));
+    mCanvas->setBackgroundColor({100, 100, 100, 255});
+    mCanvas->resize({width() - 200, height()});
 
     performLayout();
     weaveSettings->setPosition(Vector2i(0, palette->height() + 10));

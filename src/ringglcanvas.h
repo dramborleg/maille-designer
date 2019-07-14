@@ -13,7 +13,8 @@ class RingGLCanvas : public nanogui::GLCanvas
 public:
     RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
                  std::shared_ptr<Tool> tool,
-                 std::shared_ptr<TranslationTool> translate);
+                 std::shared_ptr<TranslationTool> translate,
+                 nanogui::Slider *zoomSensitivity);
     ~RingGLCanvas() { mShader.free(); }
 
     void resetState();
@@ -45,8 +46,9 @@ private:
     Eigen::Vector3f lDirection;
     // ambient, diffuse, and specular light intensities
     float aIntensity, dIntensity, sIntensity;
-    // zoom level
+    // zoom level/sensitivity
     float zoom = 8.0;
+    nanogui::Slider *zoomSensitivity;
     // the inlay being displayed on this canvas
     std::shared_ptr<MailleInlay> inlay;
     // currently selected tool

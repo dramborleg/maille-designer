@@ -1,13 +1,17 @@
 #include <unordered_map>
 
+#include <nanogui/slider.h>
+
 #include "ringglcanvas.h"
 #include "tools/tool.h"
 #include "tools/translationtool.h"
 
 RingGLCanvas::RingGLCanvas(Widget *parent, std::shared_ptr<MailleInlay> inlay,
                            std::shared_ptr<Tool> tool,
-                           std::shared_ptr<TranslationTool> translate)
+                           std::shared_ptr<TranslationTool> translate,
+                           nanogui::Slider *zoomSensitivity)
     : nanogui::GLCanvas(parent)
+    , zoomSensitivity(zoomSensitivity)
     , inlay(inlay)
     , translate(translate)
 {
@@ -174,7 +178,8 @@ bool RingGLCanvas::keyboardEvent(int key, int scancode, int action,
 bool RingGLCanvas::scrollEvent(const Eigen::Vector2i &p,
                                const Eigen::Vector2f &rel)
 {
-    zoom += (rel(1) > 0) ? -0.4 : 0.4;
+    float amt = zoomSensitivity->value();
+    zoom += (rel(1) > 0) ? -amt : amt;
     setZoom();
     return true;
 }
