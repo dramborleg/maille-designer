@@ -133,7 +133,7 @@ MailleScreen::MailleScreen()
     new Label(sPopup, "Threshold", "sans-bold");
     sPopup->addChild(threshold);
     threshold->setValue(5);
-    threshold->setRange({0, 200});
+    threshold->setRange({0, 255});
     TextBox *thresholdText = new TextBox(sPopup);
     thresholdText->setValue(std::to_string((int)threshold->value()));
     threshold->setCallback([thresholdText](float val) {
