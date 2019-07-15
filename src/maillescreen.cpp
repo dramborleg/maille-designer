@@ -334,7 +334,8 @@ void MailleScreen::exportColorReport()
 void MailleScreen::importImage()
 {
     std::string fpath = nanogui::file_dialog(
-        {{"jpg", "jpg"}, {"png", "png"}, {"gif", "gif"}, {"bmp", "bmp"}}, true);
+        {{"jpg", "jpg"}, {"png", "png"}, {"gif", "gif"}, {"bmp", "bmp"}},
+        false);
 
     if (fpath == "")
         return;
