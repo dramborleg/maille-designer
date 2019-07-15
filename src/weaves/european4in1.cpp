@@ -443,6 +443,7 @@ std::string European4in1::exportPOV(const MailleInlay &inlay) const
         << "  location  <" << camX << ", 1, " << camZ << ">\n"
         << "  right     <" << camRadius << ", 0, 0>\n"
         << "  up        <0, 0, " << camRadius << ">\n"
+        << "  sky       <0, 0, 1>\n"
         << "  direction <0, -1, 0>\n"
         << "  look_at   <" << camX << ", 0, " << camZ << ">\n}\n\n";
 
