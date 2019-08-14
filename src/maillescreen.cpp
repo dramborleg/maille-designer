@@ -429,6 +429,7 @@ void MailleScreen::loadFile()
     weaveSettings->performLayout(this->nvgContext());
     adderTool->setWeaveManager(weaveManager);
     selectionTool->setWeaveManager(weaveManager);
+    colorSelectTool->setWeaveManager(weaveManager);
 
     mCanvas->resetState();
     weaveManager->importSaveFile(this, design, *inlay);
