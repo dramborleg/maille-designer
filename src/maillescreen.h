@@ -41,6 +41,8 @@ private:
     void saveFile() const;
     void loadFile();
 
+    //indicates if the shift key is pressed for keyboard input
+    bool shift_key;
     RingGLCanvas *mCanvas;
     // list of all the tool radio buttons so they can be reset on file load
     std::vector<nanogui::Button *> toolButtons;

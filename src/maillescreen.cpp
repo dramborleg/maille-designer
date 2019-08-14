@@ -200,8 +200,14 @@ bool MailleScreen::keyboardEvent(int key, int scancode, int action,
     if (mCanvas->keyboardEvent(key, scancode, action, modifiers))
         return true;
 
+
+    if(key == GLFW_KEY_RIGHT_SHIFT || key== GLFW_KEY_LEFT_SHIFT)
+        shift_key = action == GLFW_PRESS;
+
     if (key == GLFW_KEY_A && action)
         simulateButtonClick(adderButton);
+    else if (key== GLFW_KEY_S && action && shift_key)
+        simulateButtonClick(colorSelectButton);
     else if (key == GLFW_KEY_S && action)
         simulateButtonClick(selectionButton);
     else if (key == GLFW_KEY_B && action)
@@ -210,7 +216,6 @@ bool MailleScreen::keyboardEvent(int key, int scancode, int action,
         simulateButtonClick(colorPickerButton);
     else if (key == GLFW_KEY_M && action)
         simulateButtonClick(translationButton);
-
     return Screen::keyboardEvent(key, scancode, action, modifiers);
 }
 
