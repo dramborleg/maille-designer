@@ -78,6 +78,12 @@ MailleScreen::MailleScreen()
         *fgcolor = color;
     });
 
+    // Ring Canvas
+    mCanvas = new RingGLCanvas(this, inlay, curTool, translationTool, zoom);
+    mCanvas->setPosition(Vector2i(200, 0));
+    mCanvas->setBackgroundColor({100, 100, 100, 255});
+    mCanvas->resize({width() - 200, height()});
+
     // Tool buttons
 
     // Add tool button
@@ -176,12 +182,6 @@ MailleScreen::MailleScreen()
     saveFileButton->setCallback([this]() { saveFile(); });
     Button *loadFileButton = new Button(palette, "Load", ENTYPO_ICON_FOLDER);
     loadFileButton->setCallback([this]() { loadFile(); });
-
-    // Ring Canvas
-    mCanvas = new RingGLCanvas(this, inlay, curTool, translationTool, zoom);
-    mCanvas->setPosition(Vector2i(200, 0));
-    mCanvas->setBackgroundColor({100, 100, 100, 255});
-    mCanvas->resize({width() - 200, height()});
 
     performLayout();
     weaveSettings->setPosition(Vector2i(0, palette->height() + 10));
